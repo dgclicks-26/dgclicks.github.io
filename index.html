@@ -1272,15 +1272,20 @@
     }
     .viewer-tab.active { color: var(--amber); border-bottom-color: var(--amber); }
     .viewer-panel { display: none; }
-    .viewer-panel.active { display: block; }
+    .viewer-panel.active { display: block; position: relative; z-index: 1; background: var(--cream); }
 
     /* 3D canvas container */
     .cam-3d-wrap {
       width: 100%; aspect-ratio: 4/3;
-      background: var(--ink);
+      background: #1a1510;
       position: relative; overflow: hidden;
+      cursor: grab;
     }
-    .cam-3d-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+    .cam-3d-wrap canvas { 
+      display: block; 
+      position: absolute; inset: 0;
+      width: 100% !important; height: 100% !important; 
+    }
     .cam-3d-loading {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
