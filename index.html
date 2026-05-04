@@ -1298,9 +1298,10 @@
       display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.6rem;
     }
     .cam-3d-chip {
-      font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 3px 9px; border: 1px solid var(--amber);
-      color: var(--amber); background: rgba(184,130,30,0.08);
+      font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 10px; border: 1px solid rgba(200,146,42,0.5);
+      color: #e8b84b; background: rgba(14,12,9,0.75);
+      backdrop-filter: blur(4px); border-radius: 2px;
     }
     .cam-3d-hint {
       font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -2313,14 +2314,16 @@
 
         <!-- 3D panel -->
         <div class="viewer-panel" id="panel3d">
-          <div class="cam-3d-wrap" id="cam3dWrap">
-            <div class="cam-3d-loading" id="cam3dLoading">
+          <div class="cam-3d-wrap" id="cam3dWrap" style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;cursor:grab;background:#1a1510;">
+            <div class="cam-3d-loading" id="cam3dLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:2;">
               <div class="spin"></div>
               <span>Loading 3D model…</span>
             </div>
+            <!-- Chips overlay inside the 3D view -->
+            <div id="cam3dChips" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;z-index:3;pointer-events:none;"></div>
+            <!-- Hint overlay -->
+            <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);pointer-events:none;z-index:3;white-space:nowrap;">Drag to rotate · Scroll to zoom · Double-click to reset</div>
           </div>
-          <div class="cam-3d-chips" id="cam3dChips"></div>
-          <div class="cam-3d-hint">Drag to rotate · Scroll to zoom · Double-click to reset</div>
         </div>
       </div>
 
@@ -3750,6 +3753,10 @@ function init3DViewer(glbUrl, chips) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.domElement.style.position = 'absolute';
+  renderer.domElement.style.inset = '0';
+  renderer.domElement.style.width = '100%';
+  renderer.domElement.style.height = '100%';
   wrap.appendChild(renderer.domElement);
 
   // Load GLB
