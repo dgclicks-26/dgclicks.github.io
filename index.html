@@ -2770,6 +2770,7 @@
       ['Price',      `S$${cam.price.toLocaleString()}`],
       ['Stock',      cam.stock > 0 ? `${cam.stock} available` : 'Out of stock'],
       ['Shipping',   'Singapore only · 3–5 business days'],
+      ['Template',   ibGetTemplateText()],
       ['Payment',    'PayNow or Stripe (credit/debit)'],
     ];
     return `
@@ -3272,20 +3273,21 @@
 
   function ibShowStep(n) {
     ibCurrentStep = n;
-    ['ibStep1','ibStep2','ibStep3','ibStepSuccess'].forEach(id => {
+    ['ibStep1','ibStep2','ibStep3','ibStep4','ibStepSuccess'].forEach(id => {
       document.getElementById(id).classList.remove('active');
     });
 
     const indicators = {
-      1: { ind: 'Step 1 of 3', title: 'Event Details' },
-      2: { ind: 'Step 2 of 3', title: 'Review & Confirm' },
-      3: { ind: 'Step 3 of 3', title: 'Pay to Confirm' },
-      4: { ind: 'Booking sent!', title: "You're all set" },
+      1: { ind: 'Step 1 of 4', title: 'Event Details' },
+      2: { ind: 'Step 2 of 4', title: 'Template Design' },
+      3: { ind: 'Step 3 of 4', title: 'Review & Confirm' },
+      4: { ind: 'Step 4 of 4', title: 'Pay to Confirm' },
+      5: { ind: 'Booking sent!', title: "You're all set" },
     };
     document.getElementById('ibStepIndicator').textContent = indicators[n].ind;
     document.getElementById('ibStepTitle').textContent     = indicators[n].title;
 
-    const stepIds = { 1:'ibStep1', 2:'ibStep2', 3:'ibStep3', 4:'ibStepSuccess' };
+    const stepIds = { 1:'ibStep1', 2:'ibStep2', 3:'ibStep3', 4:'ibStep4', 5:'ibStepSuccess' };
     document.getElementById(stepIds[n]).classList.add('active');
 
     const backBtn = document.getElementById('ibBtnBack');
@@ -3294,21 +3296,26 @@
 
     if (n === 1) {
       backBtn.style.display = 'none';
-      nextBtn.textContent   = 'Review Booking →';
+      nextBtn.textContent   = 'Next: Template Design →';
       nextBtn.style.display = '';
       footer.style.display  = '';
     } else if (n === 2) {
+      backBtn.style.display = '';
+      nextBtn.textContent   = 'Next: Review Booking →';
+      nextBtn.style.display = '';
+      footer.style.display  = '';
+    } else if (n === 3) {
       ibBuildSummary();
       backBtn.style.display = '';
       nextBtn.textContent   = 'Proceed to Payment →';
       nextBtn.style.display = '';
       footer.style.display  = '';
-    } else if (n === 3) {
+    } else if (n === 4) {
       backBtn.style.display = '';
       nextBtn.textContent   = "I've Paid — Confirm Booking →";
       nextBtn.style.display = '';
       footer.style.display  = '';
-    } else if (n === 4) {
+    } else if (n === 5) {
       footer.style.display = 'none';
     }
 
@@ -3342,6 +3349,23 @@
     const total    = baseAmt + nightAmt + propsAmt;
 
     return { baseHrs: duration, baseAmt, nightHrs, nightAmt, propsAmt, total, duration };
+  }
+
+  function toggleTmplMode() {
+    const mode = document.querySelector('input[name="tmplMode"]:checked');
+    if (!mode) return;
+    document.getElementById('tmplDescPanel').style.display = mode.value === 'describe' ? '' : 'none';
+    document.getElementById('tmplFilePanel').style.display = mode.value === 'file'     ? '' : 'none';
+  }
+
+  function ibGetTemplateText() {
+    const mode = document.querySelector('input[name="tmplMode"]:checked');
+    if (!mode) return 'Not specified';
+    if (mode.value === 'describe') {
+      return document.getElementById('tmplDesc').value.trim() || 'Not specified';
+    }
+    const file = document.getElementById('tmplFile').files[0];
+    return file ? `File uploaded: ${file.name}` : 'No file uploaded';
   }
 
   function ibBuildSummary() {
@@ -3430,13 +3454,15 @@
   async function ibNext() {
     if (ibCurrentStep === 1) {
       if (!ibValidateStep1()) return;
-      ibShowStep(2);
+      ibShowStep(2);                          // → Template Design
     } else if (ibCurrentStep === 2) {
+      ibShowStep(3);                          // → Review & Price
+    } else if (ibCurrentStep === 3) {
       const p = ibCalcPrice();
       document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
-      ibShowStep(3);
-    } else if (ibCurrentStep === 3) {
-      // Send booking to backend — backend will message owner on Telegram asking to confirm payment
+      ibShowStep(4);                          // → PayNow
+    } else if (ibCurrentStep === 4) {
+      // Send booking to backend
       try {
         const p = ibCalcPrice();
         const ibData = {
@@ -3450,6 +3476,7 @@
           background: document.getElementById('ibBackground').value,
           props:      document.getElementById('ibProps').value,
           notes:      document.getElementById('ibNotes').value,
+          template:   ibGetTemplateText(),
           nightHrs:   p.nightHrs,
           total:      p.total,
         };
@@ -3458,8 +3485,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(ibData),
         });
-      } catch (e) { /* backend offline — still show success to user */ }
-      ibShowStep(4);
+      } catch (e) { /* backend offline — still show success */ }
+      ibShowStep(5);                          // → Success
     }
   }
 
@@ -3480,7 +3507,7 @@
 
     <div class="ib-header">
       <div class="ib-header-left">
-        <div class="ib-step-indicator" id="ibStepIndicator">Step 1 of 3</div>
+        <div class="ib-step-indicator" id="ibStepIndicator">Step 1 of 4</div>
         <h3 id="ibStepTitle">Event Details</h3>
       </div>
       <button class="ib-close" onclick="closeInstantBook()">✕</button>
@@ -3590,8 +3617,91 @@
         </div>
       </div>
 
-      <!-- STEP 2: Price summary + what's included -->
+      <!-- STEP 2: Template Design -->
       <div class="ib-step" id="ibStep2">
+        <p style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;margin-bottom:1.2rem">
+          Personalise your photo strip template. You can upload an existing design file, or describe what you'd like and we'll create it for you.
+        </p>
+
+        <!-- Mode selector -->
+        <div style="display:flex;gap:10px;margin-bottom:1.2rem;">
+          <label style="flex:1;display:flex;align-items:center;gap:10px;padding:0.8rem 1rem;border:1px solid var(--pb-border);cursor:pointer;border-radius:2px;transition:border-color 0.2s;" id="tmplLabelDescribe">
+            <input type="radio" name="tmplMode" value="describe" checked onchange="toggleTmplMode()" style="accent-color:var(--pb-gold);" />
+            <div>
+              <div style="font-size:0.75rem;font-weight:500;color:var(--pb-text);letter-spacing:0.05em;">Describe it</div>
+              <div style="font-size:0.65rem;color:var(--pb-muted);margin-top:2px;">Tell us what you want</div>
+            </div>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:10px;padding:0.8rem 1rem;border:1px solid var(--pb-border);cursor:pointer;border-radius:2px;transition:border-color 0.2s;" id="tmplLabelFile">
+            <input type="radio" name="tmplMode" value="file" onchange="toggleTmplMode()" style="accent-color:var(--pb-gold);" />
+            <div>
+              <div style="font-size:0.75rem;font-weight:500;color:var(--pb-text);letter-spacing:0.05em;">Upload a file</div>
+              <div style="font-size:0.65rem;color:var(--pb-muted);margin-top:2px;">Send us your design</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Describe panel -->
+        <div id="tmplDescPanel">
+          <div class="ib-field">
+            <label>Describe your template</label>
+            <textarea id="tmplDesc" rows="5" placeholder="e.g. Minimalist white background, gold serif font, our couple's names 'Jane & John' at the top, wedding date '12 Dec 2025' at the bottom. Floral border around the edges. Elegant and romantic style."></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:0.8rem;">
+            <div class="ib-field">
+              <label>Colour scheme</label>
+              <input type="text" id="tmplColour" placeholder="e.g. White, gold, blush pink" />
+            </div>
+            <div class="ib-field">
+              <label>Font style</label>
+              <select id="tmplFont">
+                <option value="Serif (elegant)">Serif — elegant</option>
+                <option value="Sans-serif (modern)">Sans-serif — modern</option>
+                <option value="Script (handwritten)">Script — handwritten</option>
+                <option value="Monospace (retro)">Monospace — retro</option>
+                <option value="No preference">No preference</option>
+              </select>
+            </div>
+          </div>
+          <div class="ib-field" style="margin-top:0.8rem;">
+            <label>Text to include on strip (optional)</label>
+            <input type="text" id="tmplText" placeholder="e.g. Jane & John · 12 Dec 2025 · Solemnisation" />
+          </div>
+          <div class="ib-field" style="margin-top:0.8rem;">
+            <label>Overall vibe</label>
+            <select id="tmplVibe">
+              <option value="Elegant / Formal">Elegant / Formal</option>
+              <option value="Fun / Playful">Fun / Playful</option>
+              <option value="Minimalist / Clean">Minimalist / Clean</option>
+              <option value="Vintage / Retro">Vintage / Retro</option>
+              <option value="Romantic / Floral">Romantic / Floral</option>
+              <option value="Bold / Graphic">Bold / Graphic</option>
+              <option value="No preference">No preference</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Upload panel -->
+        <div id="tmplFilePanel" style="display:none;">
+          <div class="ib-field">
+            <label>Upload your design file</label>
+            <input type="file" id="tmplFile" accept=".jpg,.jpeg,.png,.pdf,.ai,.psd,.svg"
+              style="font-size:0.78rem;color:var(--pb-text);padding:0.5rem 0;" />
+            <div class="ib-hint">Accepted: JPG, PNG, PDF, AI, PSD, SVG. Max 20MB.<br/>We'll use this as the basis for your strip template.</div>
+          </div>
+          <div class="ib-field" style="margin-top:0.8rem;">
+            <label>Any additional notes? (optional)</label>
+            <textarea id="tmplFileNotes" rows="3" placeholder="e.g. Please add our logo at the bottom, keep the layout the same but change the font to something more modern."></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;padding:0.8rem;background:rgba(200,146,42,0.08);border-left:2px solid var(--pb-gold);font-size:0.72rem;color:var(--pb-muted);line-height:1.65;">
+          💡 We'll send you a preview of your template for approval before your event. If you're unsure, just skip this step and we'll follow up via email.
+        </div>
+      </div>
+
+      <!-- STEP 3: Price summary + what's included -->
+      <div class="ib-step" id="ibStep3">
         <div class="ib-summary" id="ibSummaryBox"></div>
         <div class="ib-included">
           <div class="ib-included-title">What's included</div>
@@ -3608,15 +3718,15 @@
         </p>
       </div>
 
-      <!-- STEP 3: PayNow -->
-      <div class="ib-step" id="ibStep3">
+      <!-- STEP 4: PayNow -->
+      <div class="ib-step" id="ibStep4">
         <div class="ib-paynow">
           <div class="ib-paynow-label">Pay via PayNow to confirm your slot</div>
           <div class="ib-paynow-num">+65 8518 7046</div>
           <div class="ib-paynow-amount">Amount to pay: <strong id="ibPayAmount">S$0</strong></div>
           <!-- PayNow QR code — upload your QR image to /images/paynow-qr.png in your GitHub repo -->
           <div class="ib-qr" id="ibQrCode">
-            <img src="https://dgclicks.github.io/images/paynow-qr.png"
+            <img src="/dgclicks.github.io/images/paynow-qr.png"
               alt="PayNow QR" style="width:100%;height:100%;object-fit:contain"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
             <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.65rem;color:#555;text-align:center;gap:4px">
@@ -3647,7 +3757,7 @@
 
     <div class="ib-footer" id="ibFooter">
       <button class="ib-btn-back" id="ibBtnBack" onclick="ibBack()" style="display:none">← Back</button>
-      <button class="ib-btn-next" id="ibBtnNext" onclick="ibNext()">Review Booking →</button>
+      <button class="ib-btn-next" id="ibBtnNext" onclick="ibNext()">Next: Template Design →</button>
     </div>
 
   </div>
