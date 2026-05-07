@@ -555,11 +555,23 @@
     .pb-features-inner { max-width: 1100px; margin: 0 auto; }
     .pb-features-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1px;
       background: var(--pb-border);
       border: 1px solid var(--pb-border);
       margin-top: 2.5rem;
+    }
+    .pb-features-cards-bottom {
+      display: flex;
+      justify-content: center;
+      background: var(--pb-border);
+      border: 1px solid var(--pb-border);
+      border-top: none;
+      gap: 1px;
+    }
+    .pb-features-cards-bottom .pb-feat-card {
+      flex: 0 0 calc(33.333% - 1px);
+      max-width: calc(33.333% - 1px);
     }
     .pb-feat-card {
       background: var(--pb-card);
@@ -1960,6 +1972,13 @@
           <div class="pb-feat-num">06</div>
           <div class="pb-feat-title">Simple transparent pricing</div>
           <div class="pb-feat-desc"><span class="pb-feat-accent">S$120/hr</span> for up to 50 pax. Night surcharge applies after 10pm. No hidden fees.</div>
+        </div>
+      </div>
+      <div class="pb-features-cards-bottom">
+        <div class="pb-feat-card">
+          <div class="pb-feat-num">07</div>
+          <div class="pb-feat-title">Convenience</div>
+          <div class="pb-feat-desc">We offer <span class="pb-feat-accent">immediate booking and confirmation</span> for events of 50 pax or smaller — no waiting, no hidden fees.</div>
         </div>
       </div>
     </div>
