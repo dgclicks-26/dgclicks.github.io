@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photobooth — Complete Procurement & Cost Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --surface2: #f9f8f5;
+  --ink: #18181a;
+  --ink2: #5a5a5f;
+  --ink3: #9a9a9f;
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.06);
+  --gold: #b8892a;
+  --gold-bg: #faf3e0;
+  --gold-border: rgba(184,137,42,0.25);
+  --red: #c0392b;
+  --red-bg: #fdf1f0;
+  --green: #1e7a4a;
+  --green-bg: #edf7f1;
+  --blue: #1a5fa8;
+  --blue-bg: #edf3fb;
+  --r: 10px;
+  --r-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.65; }
+
+.hero {
+  background: var(--ink);
+  color: #f4f2ed;
+  padding: 52px 44px 44px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border: 1px solid rgba(184,137,42,0.15);
+  border-radius: 50%;
+  top: -120px; right: -80px;
+}
+.hero-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: 14px; color: rgba(244,242,237,0.55); max-width: 500px; line-height: 1.7; }
+.hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+.chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(244,242,237,0.2);
+  color: rgba(244,242,237,0.45);
+}
+.chip.on { border-color: var(--gold); color: var(--gold); background: rgba(184,137,42,0.08); }
+
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
+}
+.nb {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 14px 22px;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  color: var(--ink3);
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  top: 1px;
+  letter-spacing: 0.02em;
+}
+.nb:hover { color: var(--ink); }
+.nb.on { color: var(--gold); border-bottom-color: var(--gold); }
+
+.pg { display: none; }
+.pg.on { display: block; }
+
+.wrap { max-width: 880px; padding: 36px 44px; }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.pg-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 30px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+.pg-desc { font-size: 13px; color: var(--ink2); margin-bottom: 30px; max-width: 520px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px 22px;
+  margin-bottom: 12px;
+}
+.card.hi { border: 2px solid var(--gold); }
+.card.blue { border-left: 3px solid var(--blue); }
+.card.green { border-left: 3px solid var(--green); }
+.card.red { border-left: 3px solid var(--red); }
+.card.gold { border-left: 3px solid var(--gold); }
+
+.ct { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.cs { font-size: 12px; color: var(--ink2); margin-bottom: 8px; }
+
+.badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-right: 4px;
+  margin-bottom: 7px;
+  letter-spacing: 0.03em;
+}
+.ba { background: var(--gold-bg); color: var(--gold); border: 0.5px solid var(--gold-border); }
+.bb { background: var(--blue-bg); color: var(--blue); }
+.bg { background: var(--green-bg); color: var(--green); }
+.br { background: var(--red-bg); color: var(--red); }
+.bn { background: var(--surface2); color: var(--ink2); border: 0.5px solid var(--border); }
+
+.sg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 14px; margin: 8px 0; }
+.sr { display: flex; gap: 8px; font-size: 12px; padding: 2px 0; }
+.sk { color: var(--ink3); min-width: 120px; flex-shrink: 0; }
+
+.row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border2); gap: 14px; font-size: 13px; }
+.row:last-child { border-bottom: none; }
+.rl { flex: 1; }
+.rl strong { font-weight: 600; display: block; }
+.rl span { font-size: 11px; color: var(--ink3); margin-top: 1px; display: block; }
+.rv {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: right;
+  white-space: nowrap;
+  min-width: 95px;
+}
+.rv small { display: block; font-size: 10px; color: var(--ink3); font-weight: 400; }
+
+.removed {
+  opacity: 0.45;
+  text-decoration: line-through;
+  position: relative;
+}
+.removed-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: var(--red-bg);
+  color: var(--red);
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 8px;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.note {
+  background: var(--surface2);
+  border-left: 2px solid var(--border);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ink2);
+  margin-top: 8px;
+  line-height: 1.65;
+}
+
+.stag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 20px 0 8px;
+}
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.metric {
+  background: var(--ink);
+  color: #f4f2ed;
+  border-radius: var(--r);
+  padding: 14px 16px;
+}
+.metric-lbl { font-size: 11px; color: rgba(244,242,237,0.45); margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+.metric-val { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; color: var(--gold); }
+.metric-sub { font-size: 11px; color: rgba(244,242,237,0.35); margin-top: 3px; }
+
+.big-total {
+  background: var(--ink);
+  border-radius: var(--r-lg);
+  padding: 22px 26px;
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bt-label { color: rgba(244,242,237,0.7); font-size: 14px; font-weight: 500; }
+.bt-val { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; color: var(--gold); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; font-size: 10px; color: var(--ink3); border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; background: var(--surface2); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--border2); vertical-align: top; line-height: 1.5; }
+tr:last-child td { border-bottom: none; }
+tr.tot td { font-weight: 600; background: var(--gold-bg); color: var(--gold); font-family: 'JetBrains Mono', monospace; }
+tr.sub-tot td { font-weight: 500; background: var(--surface2); }
+tr.removed-row td { opacity: 0.4; text-decoration: line-through; }
+
+.section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+
+.tip-row { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border2); font-size: 13px; line-height: 1.65; }
+.tip-row:last-child { border-bottom: none; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.dg { background: var(--green); }
+.da { background: var(--gold); }
+.dr { background: var(--red); }
+
+@media (max-width: 640px) {
+  .wrap { padding: 20px; }
+  .hero { padding: 32px 20px; }
+  .hero h1 { font-size: 30px; }
+  .g2, .g3 { grid-template-columns: 1fr; }
+  .nb { padding: 12px 14px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-kicker">Complete master reference · updated spec</div>
+  <h1>Equipment procurement<br>&amp; <em>total cost guide</em></h1>
+  <div class="hero-sub">Every item needed, every item removed, and every dollar — from camera to custom enclosure. Fully updated to reflect the Option B wing-fin enclosure with integrated LED panels.</div>
+  <div class="hero-chips">
+    <span class="chip on">Godox SL60W removed</span>
+    <span class="chip on">Viltrox VL-60B added</span>
+    <span class="chip on">Laptop → Beelink mini PC</span>
+    <span class="chip on">Enclosure included</span>
+    <span class="chip">S$8,700–11,600 total</span>
+  </div>
+</div>
+
+<nav>
+  <button class="nb on" onclick="go('equip',this)">Equipment</button>
+  <button class="nb" onclick="go('removed',this)">Removed items</button>
+  <button class="nb" onclick="go('consumables',this)">Consumables</button>
+  <button class="nb" onclick="go('software',this)">Software</button>
+  <button class="nb" onclick="go('enclosure',this)">Enclosure build</button>
+  <button class="nb" onclick="go('internet',this)">Internet</button>
+  <button class="nb" onclick="go('total',this)">Grand total</button>
+</nav>
+
+<!-- ══════════════════════════════════════════ EQUIPMENT ══════════════════════════════════════════ -->
+<div id="pg-equip" class="pg on">
+<div class="wrap">
+  <div class="eyebrow">What to buy</div>
+  <div class="pg-title">Equipment procurement list</div>
+  <div class="pg-desc">Updated for the enclosed Option B setup. Godox softboxes are removed and replaced. Laptop is replaced by a mini PC. All other core equipment remains unchanged.</div>
+
+  <div class="stag">Core — camera and capture</div>
+
+  <div class="card hi">
+    <span class="badge ba">Top pick</span><span class="badge bg">Buy first</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">Canon EOS R50 + RF-S 18-45mm kit lens</div><div class="cs">24.2MP APS-C mirrorless · USB-C tethering · Canon SG warranty</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$1,099</div><div style="font-size:11px;color:var(--ink3);">Alan Photo / Canon official Lazada</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Sensor</span><span>24.2MP APS-C CMOS</span></div>
+      <div class="sr"><span class="sk">Autofocus</span><span>Dual Pixel CMOS AF II</span></div>
+      <div class="sr"><span class="sk">Tethering</span><span>USB-C plug-and-play with LumaBooth</span></div>
+      <div class="sr"><span class="sk">Video</span><span>4K30 — needs V30 SD card</span></div>
+    </div>
+    <div class="note">Budget alternative: Canon EOS R100 + 18-45mm at S$739. Same print quality, slightly weaker AF. Buy from local dealers (Alan Photo, MS Color) for SG warranty — not grey market.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;">
+      <div><div class="ct">Dummy battery adapter — DR-E19 + AC adapter</div><div class="cs">Powers camera from mains. Critical — never rely on internal battery at events.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">~S$30</div>
+    </div>
+    <div class="note">Shopee SG. Search "Canon EOS R50 dummy battery DR-E19". Without this the camera shuts off mid-event at low battery. Non-negotiable accessory.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;">
+      <div><div class="ct">SanDisk Extreme 128GB V30 SD card × 2</div><div class="cs">One in camera, one spare. V30 speed class required for 4K/GIF/video modes.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">~S$70</div>
+    </div>
+    <div class="note">~S$35 each on Shopee / Lazada. Never use generic cards — video recording stutters on slow cards. V30 is the mandatory minimum spec.</div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--gold);background:var(--gold-bg);">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div>
+        <div class="ct">Tripod — pre-enclosure events only (temporary)</div>
+        <div class="cs">Once the enclosure is built, the camera mounts on a fixed internal bracket inside the tower. No tripod is needed.</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;color:var(--gold);">S$30–40</div>
+    </div>
+    <div class="note">Buy a basic Shopee tripod (~S$30–40) only for the 10–15 events you run before the enclosure is built. Retire it once the enclosure is ready. Do not buy a Manfrotto — this is a throwaway purchase.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div><div class="ct">Internal camera mount plate — 1/4"-20 thread</div><div class="cs">Fixed bracket inside enclosure at camera aperture height. Bolts directly to internal front face during fit-out.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">S$8–15</div>
+    </div>
+    <div class="note">Shopee. Search "1/4 inch camera mount plate" or "camera screw bracket". Fabricator can also weld a 1/4"-20 threaded insert directly into the internal tower face — ask at the fit-check stage. If welded in, this part is not needed separately.</div>
+  </div>
+
+  <div class="stag">Printer</div>
+
+  <div class="card hi">
+    <span class="badge ba">Top pick</span><span class="badge ba">Order first — longest lead time</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">DNP DS-RX1HS dye-sublimation printer</div><div class="cs">Event-grade · 14 kg · 700 prints/ribbon · 12.4 sec per 4×6" · mounts inside enclosure</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$1,800–2,200</div><div style="font-size:11px;color:var(--ink3);">Shopee SG · local photo dealers</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Print speed</span><span>~12.4 sec per 4×6"</span></div>
+      <div class="sr"><span class="sk">Prints per ribbon</span><span>700 sheets (1,400 strips)</span></div>
+      <div class="sr"><span class="sk">Packed dimensions</span><span>32 × 35 × 28 cm + clearance inside enclosure</span></div>
+      <div class="sr"><span class="sk">Formats</span><span>2×6 strip · 4×6 · 5×7 · 6×8</span></div>
+    </div>
+    <div class="note">Buy local — not from B&H Photo USA. US model is 110V and has no local warranty support. Search "DNP RX1HS" Shopee SG (4.8+ stars, SG local stock). Order before anything else — stock can run low.</div>
+  </div>
+
+  <div class="stag">Display and interaction</div>
+
+  <div class="card hi">
+    <span class="badge ba">Top pick</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">ASUS VT168HR 15.6" touchscreen monitor</div><div class="cs">IPS · 10-point PCAP touch · HDMI + USB-A · 1920×1080 · mounts inside enclosure front face</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$280–350</div><div style="font-size:11px;color:var(--ink3);">Lazada / Shopee / Sim Lim</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Connection</span><span>HDMI (video) + USB-A (touch data) — both cables needed</span></div>
+      <div class="sr"><span class="sk">Mounting</span><span>VESA mount bracket inside enclosure front panel</span></div>
+    </div>
+    <div class="note">Buy a screen protector film (~S$10) — guests tap and swipe repeatedly. Upgrade path: ASUS VT229H 21.5" at S$380–450 once doing consistent premium events.</div>
+  </div>
+
+  <div class="stag">Computing — laptop replaced by mini PC</div>
+
+  <div class="card hi">
+    <span class="badge ba">Replaces laptop</span><span class="badge bg">Saves 25cm of tower height</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">Beelink SER5 Pro mini PC — AMD Ryzen 5 5600H, 16GB RAM, 500GB SSD, Win 11</div><div class="cs">12 × 12 × 5 cm · fits on compact shelf inside enclosure · runs LumaBooth flawlessly</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">~S$280</div><div style="font-size:11px;color:var(--ink3);">Lazada SG</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Size vs laptop</span><span>12×12×5cm vs laptop ~38×26×2cm — enormous space saving</span></div>
+      <div class="sr"><span class="sk">Output</span><span>HDMI × 2 — one to touchscreen, one spare</span></div>
+      <div class="sr"><span class="sk">USB</span><span>USB-A × 4 — camera, touch, printer, spare</span></div>
+      <div class="sr"><span class="sk">Power</span><span>DC barrel adapter — runs from internal power strip</span></div>
+    </div>
+    <div class="note">Budget alternative: Beelink EQ12 (Intel N100, 8GB RAM) at ~S$180. Fully sufficient for LumaBooth but less headroom for future software updates. Pair with compact Bluetooth keyboard-trackpad combo (~S$40) for operator access.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div><div class="ct">Compact Bluetooth keyboard + trackpad combo</div><div class="cs">For operator access via the side panel. Stored inside enclosure. Logitech K400 Plus or similar.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">S$35–50</div>
+    </div>
+  </div>
+
+  <div class="stag">Lighting — updated for enclosure (replaces Godox SL60W softboxes)</div>
+
+  <div class="card hi">
+    <span class="badge ba">Replaces Godox SL60W</span><span class="badge bg">Fits inside 8cm fin cavity</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">Viltrox VL-60B bicolour flat LED panel × 2</div><div class="cs">60W · 3200–5600K · CRI 97 · ~4cm deep · mounts inside wing fins behind frosted diffuser</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$240–360</div><div style="font-size:11px;color:var(--ink3);">S$120–180 each · Shopee / Lazada SG</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">CCT range</span><span>3200K–5600K (bicolour — full range in one panel)</span></div>
+      <div class="sr"><span class="sk">CRI</span><span>97 — skin tones look accurate</span></div>
+      <div class="sr"><span class="sk">Depth</span><span>~4cm — fits 8cm fin cavity with 4cm air gap</span></div>
+      <div class="sr"><span class="sk">Control</span><span>Driven by external rotary knobs on tower side</span></div>
+    </div>
+    <div class="note">Alternative: Godox LiteMax 60 at similar price. Bicolour is the critical spec — one panel covers the full warm-to-cool range. Controlled by PWM dimmer + CCT controller wired to operator knobs on the tower side. No need to open the enclosure to adjust lighting.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div><div class="ct">Frosted polycarbonate diffuser panels × 2</div><div class="cs">3mm PC sheet cut to fin opening size (~45cm × 60cm each). Diffuses LED output. Looks premium.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">S$40–80</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div><div class="ct">PWM dimmer controller + CCT controller + rotary knobs × 2</div><div class="cs">Controls both LED panels simultaneously from recessed operator knobs on tower right side. ~S$45–70 total.</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;flex-shrink:0;">S$45–70</div>
+    </div>
+  </div>
+
+  <div class="stag">Top fill light — for large groups (5+ people)</div>
+
+  <div class="card hi">
+    <span class="badge ba">Added — large group coverage</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">Godox TL60 RGB tube light × 2 (spliced side-by-side)</div><div class="cs">2× 75cm tubes joined = ~150cm top fill bar · mounted horizontally above camera aperture · 2700–6500K · CRI 96</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$150–180</div><div style="font-size:11px;color:var(--ink3);">for 2× · Amazon SG / Shopee SG</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Length per tube</span><span>75cm — two joined = 150cm wide fill</span></div>
+      <div class="sr"><span class="sk">CCT range</span><span>2700K–6500K — matches fin LED panels</span></div>
+      <div class="sr"><span class="sk">CRI</span><span>96 — consistent with Viltrox VL-60B</span></div>
+      <div class="sr"><span class="sk">Depth</span><span>4.8cm diameter — mounts flush on top of tower</span></div>
+      <div class="sr"><span class="sk">Control</span><span>Godox app or wired into enclosure power strip</span></div>
+      <div class="sr"><span class="sk">Mounting</span><span>Built-in 1/4" retaining clip — screws into top of tower</span></div>
+    </div>
+    <div class="note">Why two tubes spliced: a single TL60 at 75cm only covers roughly 80cm of horizontal spread at 1.5m distance — not enough for a group of 6–8. Two joined end-to-end create a 150cm wide top fill bar that matches the group width. The TL60 has a connecting design specifically for this. Mount them horizontally above the camera aperture facing downward and forward at ~45°. This fills in the top of the frame and eliminates the shadow fall-off on subjects at the edges of the group that the fin lights alone cannot fully reach. Power from the internal enclosure power strip via the AC adapter — no battery needed at events.</div>
+  </div>
+
+  <div class="stag">Backdrop</div>
+
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Neewer / Andoer 2m×2.4m backdrop stand kit</strong><span>Crossbar + uprights + carry bag. Adjustable width. Shopee SG.</span></div><div class="rv">S$50–80</div></div>
+    <div class="row"><div class="rl"><strong>Polyester fabric backdrops — 2 to 3 designs</strong><span>1 neutral (white/beige) + 1 themed. Shopee or Taobao via Ezbuy. Avoid vinyl.</span></div><div class="rv">S$50–150</div></div>
+  </div>
+
+  <div class="stag">Connectivity and power</div>
+
+  <div class="card">
+    <div class="row"><div class="rl"><strong>TP-Link M7650 portable WiFi router</strong><span>4G LTE-A · dual-band · 15hr battery · 32 devices · unlocked nano SIM · Bizgram / Lazada</span></div><div class="rv">S$120–130</div></div>
+    <div class="row"><div class="rl"><strong>Dedicated data SIM — GOMO 50GB (Singtel) or Circles.Life 100GB</strong><span>For router only. Never use personal SIM in router.</span></div><div class="rv">S$10–15/mo</div></div>
+    <div class="row"><div class="rl"><strong>Belkin surge-protected 4-gang power strip (2m) — external</strong><span>For venue wall outlet. Internal power strip is part of enclosure fit-out.</span></div><div class="rv">~S$35</div></div>
+    <div class="row"><div class="rl"><strong>Extension cord 10m (heavy duty)</strong><span>For venue power runs. Enclosure has single IEC exit at base.</span></div><div class="rv">~S$25</div></div>
+  </div>
+
+  <div class="stag">Transport and accessories</div>
+
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Heavy-duty foldable luggage trolley</strong><span>For moving enclosure shell between van and venue. Essential — enclosure shell alone is ~20kg.</span></div><div class="rv">S$40–60</div></div>
+    <div class="row"><div class="rl"><strong>Props starter kit — hats, signs, frames</strong><span>Shopee / Taobao via Ezbuy. Replace as needed.</span></div><div class="rv">S$50–80</div></div>
+    <div class="row"><div class="rl"><strong>Padded carrying case for printer (if not in enclosure for transport)</strong><span>When transporting printer separately from enclosure shell.</span></div><div class="rv">S$40–60</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ REMOVED ══════════════════════════════════════════ -->
+<div id="pg-removed" class="pg">
+<div class="wrap">
+  <div class="eyebrow">What changed</div>
+  <div class="pg-title">Items removed from original list</div>
+  <div class="pg-desc">Two items from the original equipment list are removed entirely in the updated spec. One is replaced, one is eliminated.</div>
+
+  <div class="card red">
+    <span class="badge br">Removed — do not buy</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div>
+        <div class="ct removed">2× Godox SL60W LED lights + 80cm octabox softboxes + stands</div>
+        <div class="cs">Previously recommended as freestanding studio lights on extending arms</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:var(--red);flex-shrink:0;text-decoration:line-through;">S$280–320</div>
+    </div>
+    <div class="note" style="border-left-color:var(--red);background:var(--red-bg);">
+      <strong>Why removed:</strong> The SL60W is a cylindrical lamp head requiring a 25cm-deep cavity when paired with a softbox. The wing fin cavity is only 8cm deep. Additionally, the SL60W has an active cooling fan that exhausts heat rearward — this fan would be blocked and damaged inside a sealed fin. Flat LED panels (Viltrox VL-60B) are the correct replacement — same light quality, ~4cm deep, no fan noise in a sealed space. The stand frames are also no longer needed as lighting is integrated into the enclosure fins.
+    </div>
+  </div>
+
+  <div class="card red">
+    <span class="badge br">Removed — replaced by mini PC</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div>
+        <div class="ct removed">Acer Aspire 5 laptop — Intel i5, 8GB RAM, Win 11</div>
+        <div class="cs">Previously recommended as the booth computer</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:var(--red);flex-shrink:0;text-decoration:line-through;">S$700–800</div>
+    </div>
+    <div class="note" style="border-left-color:var(--red);background:var(--red-bg);">
+      <strong>Why replaced:</strong> A laptop is ~38×26×2cm and requires approximately 25–30cm of internal vertical clearance. The Beelink SER5 Pro mini PC is 12×12×5cm — a fraction of the size — and runs LumaBooth for Windows identically. Replacing the laptop with a mini PC directly saved 25cm of tower height, allowing the enclosure to be 145cm rather than 170cm+. The Beelink also draws less power, generates less heat, and costs S$420–520 less. Operator interaction is via a compact Bluetooth keyboard that stores inside the operator side panel.
+    </div>
+  </div>
+
+  <div class="card gold">
+    <span class="badge ba">Summary of changes</span>
+    <table style="margin-top:8px;">
+      <thead><tr><th>Item</th><th>Status</th><th>Replaced by</th><th>Cost impact</th></tr></thead>
+      <tbody>
+        <tr><td>Godox SL60W × 2 + octaboxes + stands</td><td><span class="badge br">Removed</span></td><td>Viltrox VL-60B flat LED panel × 2</td><td>−S$280–320 → +S$240–360 (net ~S$0–40 more)</td></tr>
+        <tr><td>Acer Aspire 5 laptop</td><td><span class="badge br">Removed</span></td><td>Beelink SER5 Pro mini PC</td><td>−S$700–800 → +S$280 (saves S$420–520)</td></tr>
+        <tr class="tot"><td colspan="3">Net saving from changes</td><td>S$380–480 cheaper overall</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ CONSUMABLES ══════════════════════════════════════════ -->
+<div id="pg-consumables" class="pg">
+<div class="wrap">
+  <div class="eyebrow">Per-event running costs</div>
+  <div class="pg-title">Consumables</div>
+  <div class="pg-desc">What gets used up each event. Print media, sleeves, and starter stock quantities.</div>
+
+  <div class="card hi">
+    <span class="badge ba">What to buy</span><span class="badge ba">Genuine DNP only</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">DNP DS-RX1HS 4×6" media kit (paper + ribbon, matched pair)</div><div class="cs">2 rolls paper + 2 matched ribbons = 1,400 prints per box. Paper and ribbon are inseparable — never buy third-party.</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$90–100/box</div><div style="font-size:11px;color:var(--ink3);">S$0.064–0.086 per sheet</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Prints per roll</span><span>700 sheets — each sheet = two 2×6 strips</span></div>
+      <div class="sr"><span class="sk">Cost per strip</span><span>~S$0.032–0.043</span></div>
+      <div class="sr"><span class="sk">Finish</span><span>Glossy or matte — toggle in LumaBooth, same media</span></div>
+      <div class="sr"><span class="sk">Storage</span><span>Cool, dry, sealed — SG humidity degrades unsealed media</span></div>
+    </div>
+    <div class="note">Where to buy: Shopee SG (verified sellers, 4.8+ stars) S$90–100/box · Lazada SG S$95–110 · Foto Pony / local dealers S$110–120 · DNP Asia distributor Pasir Gudang JB S$75–85 (bulk 5+ boxes).</div>
+  </div>
+
+  <div class="stag">Photo strip sleeves</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Clear OPP flat self-seal sleeve 5.5×17cm — starter choice</strong><span>Search "OPP bag photo strip 2x6" on Shopee. Buy 500 pcs at once — price drops sharply at volume.</span></div><div class="rv">S$3–8<small>per 100 pcs</small></div></div>
+    <div class="row"><div class="rl"><strong>PVC bookmark sleeve with hang hole — premium upgrade</strong><span>Thicker vinyl, feels substantial. Pair with gold/silver tassel for keepsake effect. Shopee / Taobao via Ezbuy.</span></div><div class="rv">S$8–15<small>per 100 pcs</small></div></div>
+    <div class="row"><div class="rl"><strong>Gold / silver tassels (for PVC bookmark sleeves)</strong><span>Turns strip into a bag charm or keepsake. Shopee ~S$10 for 200 pcs.</span></div><div class="rv">~S$10<small>per 200 pcs</small></div></div>
+    <div class="row"><div class="rl"><strong>Custom branded cardstock folder — corporate / premium only</strong><span>Client logo printed. MOQ 100–500 pcs. 3–7 day lead time. Vistaprint SG / Singprint.</span></div><div class="rv">S$30–60<small>per 100 pcs</small></div></div>
+  </div>
+
+  <div class="stag">Cost per 50-pax event (worst case: 3 prints each)</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Item</th><th>Unit cost</th><th>Quantity</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>DNP 4×6 media (paper + ribbon)</td><td>S$0.071/sheet</td><td>150 sheets</td><td>S$10.65</td></tr>
+        <tr><td>OPP clear sleeves</td><td>S$0.05 each</td><td>300 strips</td><td>S$15.00</td></tr>
+        <tr><td>Tassels (if using PVC bookmark sleeves)</td><td>S$0.10 each</td><td>300</td><td>S$30.00 optional</td></tr>
+        <tr class="sub-tot"><td>Total — no tassels</td><td colspan="3">S$25.65</td></tr>
+        <tr class="tot"><td>Total — with tassels</td><td colspan="3">S$55.65</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stag">Starter consumables stock — first 3 months</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>DNP media kit × 3 boxes (4,200 prints)</strong></div><div class="rv">S$270–360</div></div>
+    <div class="row"><div class="rl"><strong>OPP clear sleeves × 500 pcs</strong></div><div class="rv">S$15–25</div></div>
+    <div class="row"><div class="rl"><strong>PVC bookmark sleeves × 200 pcs</strong></div><div class="rv">S$20–30</div></div>
+    <div class="row"><div class="rl"><strong>Gold/silver tassels × 200 pcs</strong></div><div class="rv">S$10–15</div></div>
+    <div class="big-total">
+      <span class="bt-label">Starter consumables stock</span>
+      <span class="bt-val">S$315–430</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ SOFTWARE ══════════════════════════════════════════ -->
+<div id="pg-software" class="pg">
+<div class="wrap">
+  <div class="eyebrow">Subscriptions and licences</div>
+  <div class="pg-title">Software</div>
+  <div class="pg-desc">One subscription covers everything — photos, GIFs, boomerangs, live video, QR sharing, WhatsApp, email, green screen.</div>
+
+  <div class="card hi">
+    <span class="badge ba">All features included</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">LumaBooth for Windows (formerly DSLR Booth) — annual subscription</div><div class="cs">USD $17/month billed annually · ~S$23/month · ~S$275/year · 2 device licences</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">~S$275/yr</div><div style="font-size:11px;color:var(--ink3);">dslrbooth.com</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Photos + QR share</span><span>Included</span></div>
+      <div class="sr"><span class="sk">GIF / Boomerang</span><span>Included</span></div>
+      <div class="sr"><span class="sk">Live video / slow-mo</span><span>Included</span></div>
+      <div class="sr"><span class="sk">WhatsApp / email share</span><span>Included</span></div>
+      <div class="sr"><span class="sk">fotoShare cloud</span><span>Basic plan included — required for QR</span></div>
+      <div class="sr"><span class="sk">Green screen / AI bg</span><span>Included</span></div>
+    </div>
+    <div class="note">The old one-time DSLR Booth licence no longer exists. Annual plan at USD $204/year includes fotoShare cloud hosting that the old licence did not have. Windows-only — compatible with Beelink mini PC running Win 11.</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ ENCLOSURE ══════════════════════════════════════════ -->
+<div id="pg-enclosure" class="pg">
+<div class="wrap">
+  <div class="eyebrow">Custom fabrication</div>
+  <div class="pg-title">Enclosure build costs</div>
+  <div class="pg-desc">Full cost breakdown for the Option B wing-fin tower enclosure — 145cm tall, 1.5mm aluminium, 45cm hinged fins, integrated LED panels, mini PC access system.</div>
+
+  <div class="stag">Design and drawings (before fabrication)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Freelance CAD drawings (DXF/DWG)</strong><span>Upwork / Fiverr / Carousell SG. Dimensioned 2D technical drawings from your sketch and measurements. Allow 1 week.</span></div><div class="rv">S$80–200</div></div>
+  </div>
+
+  <div class="stag">Tower body fabrication — 1.5mm aluminium, 145cm H × 44cm W × 50cm D</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Laser cutting + CNC bending — all tower panels</strong><span>Cutouts: screen aperture, camera hole, print exit slot, ventilation perforations, operator panel, A3 graphic slot, power cable exit, CCT/dim knob holes.</span></div><div class="rv">S$400–700</div></div>
+    <div class="row"><div class="rl"><strong>TIG welding + structural assembly</strong><span>Frame, printer shelf bracket, mini PC shelf, internal cable management rails.</span></div><div class="rv">S$300–500</div></div>
+    <div class="row"><div class="rl"><strong>Rear access door + full-length hinges + magnetic latch</strong><span>Full-height hinged rear panel. Push-to-open magnetic closure — no external handle.</span></div><div class="rv">S$150–250</div></div>
+    <div class="row"><div class="rl"><strong>Operator side access panel + magnetic latch</strong><span>60cm H × 14cm W flush panel in right face. Exposes mini PC shelf without opening rear door.</span></div><div class="rv">S$80–150</div></div>
+    <div class="row"><div class="rl"><strong>A3 graphic insert slot (recessed channel)</strong><span>Left face of tower. 305 × 435mm with 3mm lip. Client branding inserts slide in/out.</span></div><div class="rv">S$50–100</div></div>
+    <div class="row"><div class="rl"><strong>Heavy-duty rubber levelling feet × 4</strong><span>Adjustable, prevents rocking on uneven venue floors.</span></div><div class="rv">S$30–60</div></div>
+  </div>
+
+  <div class="stag">Wing fin fabrication — × 2 fins, 45cm W × 60cm H × 8cm D each</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Fin shells laser cut + bent — 1.5mm aluminium × 2</strong><span>Front face open (diffuser panel slot). Internal LED panel mounting face. Rear ventilation holes.</span></div><div class="rv">S$200–350</div></div>
+    <div class="row"><div class="rl"><strong>Full-length piano hinges × 2 + welded angle stop tabs at 30–35°</strong><span>180° stainless piano hinge. Stop tab welded after prototype fit-check confirms exact angle.</span></div><div class="rv">S$100–180</div></div>
+    <div class="row"><div class="rl"><strong>Cable pass-throughs at hinge edge × 2</strong><span>Power + CCT/dim signal routing through hinge into tower. Rubber grommets on both sides.</span></div><div class="rv">S$20–40</div></div>
+  </div>
+
+  <div class="stag">Surface finish</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Powder coating — full enclosure including both fins (RAL colour)</strong><span>Tower body + both fins coated together for colour consistency. Matte or gloss. Sunny Metal or Anderco in-house.</span></div><div class="rv">S$250–450</div></div>
+    <div class="row"><div class="rl"><strong>Laser-engraved logo on one tower panel</strong><span>Brand name or logo cut into aluminium face panel. Contrast colour fill.</span></div><div class="rv">S$80–150</div></div>
+  </div>
+
+  <div class="stag">Lighting components (inside fins)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Viltrox VL-60B bicolour flat LED panel × 2</strong><span>60W · 3200–5600K · CRI 97 · ~4cm deep. Shopee / Lazada SG. Already listed in equipment — shown here for enclosure context.</span></div><div class="rv">S$240–360</div></div>
+    <div class="row"><div class="rl"><strong>3mm frosted polycarbonate diffuser panels × 2</strong><span>Cut to fin opening size (~45 × 60cm each). Press-fit into fin front face.</span></div><div class="rv">S$40–80</div></div>
+    <div class="row"><div class="rl"><strong>PWM dimmer controller + CCT controller + rotary knobs × 2</strong><span>Recessed into tower right side. Controls both panels simultaneously. Wired in parallel through hinge cables.</span></div><div class="rv">S$45–70</div></div>
+    <div class="row"><div class="rl"><strong>Through-hinge wiring — 1.5mm² spiral-wrapped cable + grommets + connectors</strong><span>For both fins. Loops loosely inside hinge when fin is folded — no strain on connectors.</span></div><div class="rv">S$20–40</div></div>
+  </div>
+
+  <div class="stag">Internal fit-out components (self-sourced and installed)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Adjustable VESA monitor mount bracket</strong><span>Mounts ASUS VT168HR at correct height on internal front panel. Shopee.</span></div><div class="rv">S$30–60</div></div>
+    <div class="row"><div class="rl"><strong>Slim 4-gang power strip — internal</strong><span>Printer, touchscreen, mini PC, router all powered from one internal strip. One IEC cord exits at base.</span></div><div class="rv">S$25–40</div></div>
+    <div class="row"><div class="rl"><strong>Velcro cable ties + internal cable management channels</strong><span>All internal wiring organised and accessible. Use velcro, not zip ties — cables need regular access.</span></div><div class="rv">S$15–25</div></div>
+    <div class="row"><div class="rl"><strong>Rubber vibration dampening mounts for printer shelf</strong><span>Prevents DNP rattling or shifting during transport when enclosure is in the van.</span></div><div class="rv">S$15–30</div></div>
+    <div class="row"><div class="rl"><strong>Vinyl logo decal (alternative if no laser engraving)</strong><span>Custom-cut vinyl from Shopee. ~S$30–60.</span></div><div class="rv">S$30–60</div></div>
+  </div>
+
+  <div class="big-total">
+    <span class="bt-label">Total enclosure build cost (aluminium, powder coat, fins, lighting, fit-out)</span>
+    <span class="bt-val">S$2,190–3,843</span>
+  </div>
+  <div style="font-size:12px;color:var(--ink3);margin-top:8px;line-height:1.8;padding:0 2px;">
+    Budget version (mild steel, no engraving): ~S$1,500–2,200 &nbsp;·&nbsp; Premium (brushed anodised aluminium): ~S$3,500–5,000<br>
+    Note: LED panels (S$240–360) already counted in Equipment tab — not double-counted in Grand Total.
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ INTERNET ══════════════════════════════════════════ -->
+<div id="pg-internet" class="pg">
+<div class="wrap">
+  <div class="eyebrow">Connectivity</div>
+  <div class="pg-title">Internet setup</div>
+  <div class="pg-desc">Required for QR sharing, digital downloads, GIF/video uploads. Dedicated router — not your phone hotspot.</div>
+
+  <div class="card hi">
+    <span class="badge ba">Recommended router</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div><div class="ct">TP-Link M7650 portable WiFi router</div><div class="cs">4G LTE-Advanced · Dual-band 2.4+5GHz · 15hr battery · 32 devices · Screen display · Nano SIM · Unlocked</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;">S$120–130</div><div style="font-size:11px;color:var(--ink3);">Bizgram / Lazada SG / Courts</div></div>
+    </div>
+    <div class="sg">
+      <div class="sr"><span class="sk">Upload speed</span><span>Up to 50 Mbps — sufficient for video QR uploads</span></div>
+      <div class="sr"><span class="sk">Battery</span><span>15 hours — plug into internal power strip during events</span></div>
+      <div class="sr"><span class="sk">SIM</span><span>Unlocked nano SIM — all SG networks</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Dedicated data SIM — GOMO 50GB on Singtel</strong><span>~S$10/month. Covers 25–100 events at ~500MB–2GB per event.</span></div><div class="rv">S$10–15/mo</div></div>
+    <div class="note">Never put your personal SIM in the router. A dedicated SIM is clean and professional. Singtel and M1 have the best indoor coverage at SG function rooms and community centres.</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ GRAND TOTAL ══════════════════════════════════════════ -->
+<div id="pg-total" class="pg">
+<div class="wrap">
+  <div class="eyebrow">Complete financial picture</div>
+  <div class="pg-title">Grand total — everything</div>
+  <div class="pg-desc">Every dollar from camera to enclosure, consumables to software. One-time costs, recurring monthly costs, and per-event variable costs.</div>
+
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="metric"><div class="metric-lbl">Total to launch</div><div class="metric-val">~S$9,200</div><div class="metric-sub">Mid-range estimate</div></div>
+    <div class="metric"><div class="metric-lbl">Break-even</div><div class="metric-val">~22–26</div><div class="metric-sub">sessions at S$160/hr × 3hrs</div></div>
+    <div class="metric"><div class="metric-lbl">Gross profit/session</div><div class="metric-val">~S$250</div><div class="metric-sub">at S$180/hr vs S$215 cost</div></div>
+  </div>
+
+  <div class="stag">Section 1 — Core equipment (one-time)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>Canon EOS R50 + RF-S 18-45mm kit lens</strong><span>Alan Photo / Canon official Lazada</span></div><div class="rv">S$1,099</div></div>
+    <div class="row"><div class="rl"><strong>DNP DS-RX1HS dye-sublimation printer</strong><span>Shopee SG / local photo dealers</span></div><div class="rv">S$1,800–2,200</div></div>
+    <div class="row"><div class="rl"><strong>ASUS VT168HR 15.6" touchscreen monitor</strong><span>Lazada / Shopee / Sim Lim Square</span></div><div class="rv">S$280–350</div></div>
+    <div class="row"><div class="rl"><strong>Beelink SER5 Pro mini PC (replaces laptop)</strong><span>Lazada SG · AMD Ryzen 5 5600H · 16GB RAM · Win 11</span></div><div class="rv">~S$280</div></div>
+    <div class="row"><div class="rl"><strong>Viltrox VL-60B bicolour flat LED panel × 2 (replaces Godox SL60W)</strong><span>Shopee / Lazada SG · Mounts inside enclosure fins</span></div><div class="rv">S$240–360</div></div>
+    <div class="row"><div class="rl"><strong>Frosted polycarbonate diffuser panels × 2</strong><span>Local plastic suppliers / Shopee</span></div><div class="rv">S$40–80</div></div>
+    <div class="row"><div class="rl"><strong>PWM dimmer + CCT controller + operator knobs</strong><span>Shopee SG</span></div><div class="rv">S$45–70</div></div>
+    <div class="row"><div class="rl"><strong>Backdrop stand + 2–3 polyester fabric backdrops</strong><span>Shopee SG / Taobao via Ezbuy</span></div><div class="rv">S$100–230</div></div>
+    <div class="row"><div class="rl"><strong>Basic tripod — pre-enclosure events only (temporary)</strong><span>Shopee SG. Retire once enclosure is built. Do not buy Manfrotto for this.</span></div><div class="rv">S$30–40</div></div>
+    <div class="row"><div class="rl"><strong>Internal camera mount plate (1/4"-20 thread)</strong><span>Shopee SG. Fixed bracket inside enclosure. Can also be welded in by fabricator.</span></div><div class="rv">S$8–15</div></div>
+    <div class="row"><div class="rl"><strong>TP-Link M7650 portable WiFi router</strong><span>Bizgram / Lazada SG / Courts</span></div><div class="rv">S$120–130</div></div>
+    <div class="row"><div class="rl"><strong>Dummy battery adapter (DR-E19 + AC adapter)</strong><span>Shopee SG</span></div><div class="rv">~S$30</div></div>
+    <div class="row"><div class="rl"><strong>SanDisk Extreme 128GB V30 SD card × 2</strong><span>Shopee / Lazada</span></div><div class="rv">~S$70</div></div>
+    <div class="row"><div class="rl"><strong>Compact Bluetooth keyboard + trackpad combo</strong><span>Shopee SG · operator access inside enclosure</span></div><div class="rv">S$35–50</div></div>
+    <div class="row"><div class="rl"><strong>Belkin surge-protected power strip (external) + 10m extension cord</strong><span>Shopee SG / Courts</span></div><div class="rv">S$60</div></div>
+    <div class="row"><div class="rl"><strong>Heavy-duty foldable luggage trolley</strong><span>Shopee SG</span></div><div class="rv">S$40–60</div></div>
+    <div class="row"><div class="rl"><strong>Props starter kit + padded printer carry case</strong><span>Shopee / Taobao via Ezbuy</span></div><div class="rv">S$90–140</div></div>
+    <div class="row"><div class="rl"><strong>Godox TL60 RGB tube light × 2 — top fill strip for large groups</strong><span>Amazon SG / Shopee SG. Spliced side-by-side for 150cm top fill coverage.</span></div><div class="rv">S$150–180</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Section 1 subtotal</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">S$4,505–5,444</span>
+    </div>
+  </div>
+
+  <div class="stag">Section 2 — Custom enclosure build (one-time)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>CAD drawings (DXF/DWG)</strong><span>Freelance draughtsperson — Upwork / Fiverr / Carousell SG</span></div><div class="rv">S$80–200</div></div>
+    <div class="row"><div class="rl"><strong>Tower body — laser cutting + CNC bending</strong><span>All cutouts included. Sunny Metal or Anderco.</span></div><div class="rv">S$400–700</div></div>
+    <div class="row"><div class="rl"><strong>TIG welding + structural assembly</strong><span>Frame, shelves, internal rails</span></div><div class="rv">S$300–500</div></div>
+    <div class="row"><div class="rl"><strong>Rear access door + hinges + magnetic latch</strong><span>Full-height</span></div><div class="rv">S$150–250</div></div>
+    <div class="row"><div class="rl"><strong>Operator side access panel + magnetic latch</strong><span>60cm × 14cm, right face</span></div><div class="rv">S$80–150</div></div>
+    <div class="row"><div class="rl"><strong>A3 graphic insert slot (recessed channel)</strong><span>Left face, swappable client branding</span></div><div class="rv">S$50–100</div></div>
+    <div class="row"><div class="rl"><strong>Levelling feet × 4</strong><span>Heavy-duty adjustable rubber</span></div><div class="rv">S$30–60</div></div>
+    <div class="row"><div class="rl"><strong>Wing fin shells × 2 (laser cut + bent, 1.5mm aluminium)</strong><span>45cm W × 60cm H × 8cm D each</span></div><div class="rv">S$200–350</div></div>
+    <div class="row"><div class="rl"><strong>Piano hinges × 2 + welded angle stop tabs</strong><span>Full-length stainless, 30–35° stop</span></div><div class="rv">S$100–180</div></div>
+    <div class="row"><div class="rl"><strong>Cable pass-throughs + grommets × 2</strong><span>Through-hinge wiring for LED panels</span></div><div class="rv">S$20–40</div></div>
+    <div class="row"><div class="rl"><strong>Powder coating — full enclosure including fins</strong><span>RAL colour of choice, matte or gloss. Both coated together.</span></div><div class="rv">S$250–450</div></div>
+    <div class="row"><div class="rl"><strong>Laser-engraved logo panel</strong><span>Brand name or logo, contrast fill</span></div><div class="rv">S$80–150</div></div>
+    <div class="row"><div class="rl"><strong>Internal fit-out parts — VESA bracket, power strip, velcro ties, rubber mounts</strong><span>Self-sourced from Shopee. Installed by you.</span></div><div class="rv">S$85–155</div></div>
+    <div class="row"><div class="rl"><strong>Through-hinge wiring — spiral-wrapped cable + connectors</strong><span>1.5mm² minimum. Both fins.</span></div><div class="rv">S$20–40</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Section 2 subtotal</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">S$1,845–3,325</span>
+    </div>
+  </div>
+
+  <div class="stag">Section 3 — Software (annual recurring)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>LumaBooth for Windows — annual subscription</strong><span>USD $204/yr (~S$275). Includes fotoShare cloud, all modes, 2 devices.</span></div><div class="rv">~S$275/yr</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Section 3 subtotal</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">~S$275/yr</span>
+    </div>
+  </div>
+
+  <div class="stag">Section 4 — Starter consumables stock (one-time outlay)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>DNP media kit × 3 boxes (4,200 prints)</strong><span>Shopee SG</span></div><div class="rv">S$270–360</div></div>
+    <div class="row"><div class="rl"><strong>OPP clear sleeves × 500 pcs</strong><span>Shopee SG</span></div><div class="rv">S$15–25</div></div>
+    <div class="row"><div class="rl"><strong>PVC bookmark sleeves × 200 pcs + tassels × 200 pcs</strong><span>Shopee SG / Taobao via Ezbuy</span></div><div class="rv">S$30–45</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Section 4 subtotal</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">S$315–430</span>
+    </div>
+  </div>
+
+  <div class="stag">Section 5 — Monthly recurring costs</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>LumaBooth subscription (annual plan, prorated monthly)</strong></div><div class="rv">~S$23/mo</div></div>
+    <div class="row"><div class="rl"><strong>Data SIM for TP-Link M7650 router (GOMO 50GB)</strong></div><div class="rv">S$10–15/mo</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Monthly recurring (fixed)</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">S$33–38/mo</span>
+    </div>
+  </div>
+
+  <div class="stag">Section 6 — Per-event variable costs (50 pax, 3 prints each)</div>
+  <div class="card">
+    <div class="row"><div class="rl"><strong>DNP print media (150 sheets)</strong></div><div class="rv">~S$10.65</div></div>
+    <div class="row"><div class="rl"><strong>OPP sleeves (300 strips)</strong></div><div class="rv">~S$15.00</div></div>
+    <div class="row"><div class="rl"><strong>Transport — Toyota Hiace rental round trip</strong><span>~S$88 rental + S$15–25 fuel. Or Lalamove 5-door van ~S$70–140.</span></div><div class="rv">S$50–140</div></div>
+    <div class="row"><div class="rl"><strong>Equipment amortisation (spread over ~300 sessions)</strong></div><div class="rv">~S$28</div></div>
+    <div class="row"><div class="rl"><strong>Contingency (10%)</strong></div><div class="rv">~S$20</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:4px;border-top:1px solid var(--border);">
+      <span style="font-size:13px;font-weight:600;">Total cost per 3-hr session</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;">~S$215–250</span>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="stag">Grand total summary</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Section</th><th>Category</th><th>Low</th><th>Mid</th><th>High</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Core equipment (one-time)</td><td>S$4,505</td><td>S$4,975</td><td>S$5,444</td></tr>
+        <tr><td>2</td><td>Custom enclosure build (one-time)</td><td>S$1,845</td><td>S$2,585</td><td>S$3,325</td></tr>
+        <tr><td>3</td><td>Software — year 1</td><td>S$275</td><td>S$275</td><td>S$275</td></tr>
+        <tr><td>4</td><td>Starter consumables stock</td><td>S$315</td><td>S$373</td><td>S$430</td></tr>
+        <tr class="sub-tot"><td colspan="2">Total one-time investment to launch</td><td>S$6,940</td><td>S$8,208</td><td>S$9,476</td></tr>
+        <tr class="tot"><td colspan="2">Recommended mid-range estimate</td><td colspan="3" style="text-align:center;">~S$8,200</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="big-total">
+    <div>
+      <div class="bt-label">Total to launch — mid-range estimate</div>
+      <div style="font-size:12px;color:rgba(244,242,237,0.35);margin-top:3px;">Budget (no enclosure): ~S$5,300 · Premium (brushed anodised): ~S$12,000</div>
+    </div>
+    <div class="bt-val">~S$8,200</div>
+  </div>
+
+  <div class="stag" style="margin-top:24px;">Revenue and break-even at updated pricing</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Scenario</th><th>Rate</th><th>Revenue / 3hr session</th><th>Cost / session</th><th>Profit</th><th>Break-even</th></tr></thead>
+      <tbody>
+        <tr><td>Without enclosure (bare setup)</td><td>S$120/hr</td><td>S$360</td><td>S$215</td><td>S$145</td><td>~37 sessions</td></tr>
+        <tr><td>With enclosure (mid-range)</td><td>S$170/hr</td><td>S$510</td><td>S$235</td><td>S$275</td><td>~30 sessions</td></tr>
+        <tr class="tot"><td>With enclosure (premium events)</td><td>S$220/hr</td><td>S$660</td><td>S$250</td><td>S$410</td><td>~20 sessions</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:10px;">The enclosure increases your cost base by ~S$8,200 but unlocks S$50–100/hr higher pricing. At the premium rate of S$220/hr the total investment is recovered in ~20 sessions. That is 20 events at 3 hours each — achievable within 3–4 months of consistent bookings.</div>
+  </div>
+</div>
+</div>
+
+<script>
+function go(id, btn) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

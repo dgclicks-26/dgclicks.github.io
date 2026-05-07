@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photobooth Enclosure Design Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --black: #0e0e0c;
+    --white: #f7f5f0;
+    --ink: #1c1c19;
+    --muted: #6b6b65;
+    --faint: #e8e6e0;
+    --accent: #c4873a;
+    --accent-light: #f5ead8;
+    --accent-dark: #8a5c20;
+    --info: #2563a8;
+    --info-light: #ddeaf8;
+    --success: #2a7a4b;
+    --success-light: #d8f0e4;
+    --warn: #a05c10;
+    --warn-light: #fdefd8;
+    --danger: #b83030;
+    --danger-light: #fde8e8;
+    --border: rgba(0,0,0,0.1);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    background: var(--white);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+
+  .hero {
+    background: var(--black);
+    color: var(--white);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 300px; height: 300px;
+    border: 1px solid rgba(196,135,58,0.2);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: 60px;
+    width: 180px; height: 180px;
+    border: 1px solid rgba(196,135,58,0.12);
+    border-radius: 50%;
+  }
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p {
+    font-size: 14px;
+    color: rgba(247,245,240,0.6);
+    max-width: 480px;
+    line-height: 1.65;
+  }
+  .version-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .vtag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 0.5px solid rgba(247,245,240,0.2);
+    color: rgba(247,245,240,0.55);
+  }
+  .vtag.active { border-color: var(--accent); color: var(--accent); background: rgba(196,135,58,0.08); }
+
+  .nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+  }
+  .nav-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+    top: 1px;
+  }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .content { padding: 32px 40px; max-width: 900px; }
+
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .card.accent { border-left: 3px solid var(--accent); }
+  .card.info { border-left: 3px solid var(--info); }
+  .card.success { border-left: 3px solid var(--success); }
+  .card.warn { border-left: 3px solid var(--warn); }
+  .card.danger { border-left: 3px solid var(--danger); }
+  .card.featured { border: 2px solid var(--accent); }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-right: 5px;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .badge-accent { background: var(--accent-light); color: var(--accent-dark); }
+  .badge-info { background: var(--info-light); color: var(--info); }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-warn { background: var(--warn-light); color: var(--warn); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-neu { background: var(--faint); color: var(--muted); }
+
+  .row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--faint); font-size: 13px; gap: 12px; }
+  .row:last-child { border-bottom: none; }
+  .rl { flex: 1; }
+  .rl strong { display: block; font-weight: 500; }
+  .rl span { font-size: 11px; color: var(--muted); margin-top: 1px; display: block; }
+  .rv { text-align: right; font-weight: 600; white-space: nowrap; min-width: 90px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--faint); font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; background: #fafaf8; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--faint); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  tr.tot td { font-weight: 600; background: var(--accent-light); color: var(--accent-dark); }
+  tr.good td { background: var(--success-light); }
+
+  .total-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--black);
+    border-radius: var(--radius);
+    margin-top: 10px;
+    color: var(--white);
+  }
+  .total-bar .lb { font-size: 13px; font-weight: 500; }
+  .total-bar .vl { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--accent); }
+
+  .step-row { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--faint); }
+  .step-row:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-light); color: var(--accent-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .step-body { font-size: 13px; flex: 1; line-height: 1.65; }
+  .step-title { font-weight: 600; margin-bottom: 3px; color: var(--ink); }
+  .step-desc { color: var(--muted); font-size: 12px; }
+
+  .tip-row { display: flex; gap: 11px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--faint); font-size: 13px; line-height: 1.65; }
+  .tip-row:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .dg { background: var(--success); }
+  .da { background: var(--accent); }
+  .dr { background: var(--danger); }
+
+  .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px; margin: 8px 0; }
+  .sr { display: flex; gap: 6px; font-size: 12px; padding: 2px 0; }
+  .sk { color: var(--muted); min-width: 120px; flex-shrink: 0; }
+
+  .stag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 18px 0 8px;
+  }
+
+  .dimension-box {
+    background: var(--black);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin-bottom: 14px;
+  }
+  .dimension-box .dim-label { color: var(--accent); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .dimension-box .dim-val { color: var(--white); }
+  .dimension-box .dim-note { color: rgba(247,245,240,0.45); font-size: 11px; }
+
+  .svg-wrap { background: #fafaf8; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; justify-content: center; margin-bottom: 14px; }
+
+  .fin-note {
+    background: var(--accent-light);
+    border: 1px solid rgba(196,135,58,0.3);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--accent-dark);
+    margin-bottom: 14px;
+    line-height: 1.65;
+  }
+
+  .why {
+    background: #fafaf8;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-top: 10px;
+    border-left: 2px solid var(--faint);
+  }
+
+  .access-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .access-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 15px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .access-card.rec { border: 2px solid var(--accent); }
+  .access-title { font-weight: 600; font-size: 13px; margin-bottom: 5px; }
+
+  @media (max-width: 640px) {
+    .content { padding: 20px; }
+    .hero { padding: 32px 20px; }
+    .hero h1 { font-size: 28px; }
+    .two-col, .three-col, .access-grid { grid-template-columns: 1fr; }
+    .nav-btn { padding: 12px 14px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Design specification document</div>
+  <h1>Photobooth enclosure<br><em>Option B — wing fins</em></h1>
+  <p>Consolidated design guide incorporating all improvements and decisions made across the full planning conversation.</p>
+  <div class="version-row">
+    <span class="vtag active">v2.0 — compact 145cm</span>
+    <span class="vtag">45cm hinged fins</span>
+    <span class="vtag">integrated LED panels</span>
+    <span class="vtag">mini PC</span>
+    <span class="vtag">operator side access</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('overview',this)">Overview</button>
+  <button class="nav-btn" onclick="showPage('dimensions',this)">Dimensions</button>
+  <button class="nav-btn" onclick="showPage('fins',this)">Fin system</button>
+  <button class="nav-btn" onclick="showPage('lighting',this)">Lighting</button>
+  <button class="nav-btn" onclick="showPage('access',this)">Laptop access</button>
+  <button class="nav-btn" onclick="showPage('materials',this)">Materials</button>
+  <button class="nav-btn" onclick="showPage('fabricators',this)">Fabricators</button>
+  <button class="nav-btn" onclick="showPage('process',this)">Build process</button>
+  <button class="nav-btn" onclick="showPage('cost',this)">Cost</button>
+  <button class="nav-btn" onclick="showPage('tips',this)">Tips</button>
+</nav>
+
+<!-- ═══════════ OVERVIEW ═══════════ -->
+<div id="page-overview" class="page active">
+<div class="content">
+  <div class="section-eyebrow">Design summary</div>
+  <div class="section-title">What changed and why</div>
+  <div class="section-desc">This version resolves every issue raised during planning — height, the light arm eyesore, laptop access, light coverage at 1.5m, and fin transport.</div>
+
+  <div class="three-col">
+    <div class="card accent">
+      <div class="card-title">Height reduced</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--accent);margin:6px 0;">185 → 145cm</div>
+      <div style="font-size:12px;color:var(--muted);">Camera at 140cm — more flattering upward angle for groups. Mini PC replaces laptop to save 25cm of internal height.</div>
+    </div>
+    <div class="card info">
+      <div class="card-title">Lights enclosed</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--info);margin:6px 0;">Arms → fins</div>
+      <div style="font-size:12px;color:var(--muted);">Protruding Godox arms replaced with 45cm aluminium wing fins. LED panels recessed behind frosted polycarbonate. No exposed hardware.</div>
+    </div>
+    <div class="card success">
+      <div class="card-title">Transport solved</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--success);margin:6px 0;">Hinged fold</div>
+      <div style="font-size:12px;color:var(--muted);">45cm fins fold flat against the tower on 180° hinges with a stop tab at 45° inward. Fits in Hiace van. 55cm fins require detachable pin system.</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:4px;">
+    <div class="card warn">
+      <div class="card-title">Laptop access resolved</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.65;">Three options designed: operator side panel at waist height, pull-out drawer shelf, or external laptop behind the tower. Mini PC + wireless keyboard recommended for compact builds. All allow mid-event access without opening the full rear door.</div>
+    </div>
+    <div class="card accent">
+      <div class="card-title">Light coverage confirmed</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.65;">45cm fins at 30–35° inward angle with 60–80W bicolour LED panels provides 120–150cm coverage at 1.5m — sufficient for groups of 2–4. Operator-accessible brightness and CCT knobs recessed in the tower side.</div>
+    </div>
+  </div>
+
+  <div class="stag" style="margin-top:24px;">All improvements at a glance</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Issue raised</th><th>Original design</th><th>Updated design</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Too tall</td><td>185cm tower</td><td>145cm with mini PC + lower camera position</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>Light arms are an eyesore</td><td>Godox SL60W on extending arms</td><td>Flat LED panels in enclosed wing fins</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>Fins not foldable at 55cm</td><td>55cm fixed fins</td><td>45cm single-knuckle hinged fins with stop tab</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>Laptop inaccessible mid-event</td><td>Sealed inside tower</td><td>Side operator panel or pull-out drawer or external</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>Light coverage at 1.5m insufficient</td><td>20cm fins, zero angle</td><td>45cm fins, 30–35° inward, 60–80W bicolour panels</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>No light adjustment</td><td>Fixed brightness and CCT</td><td>Recessed rotary knobs on tower side for brightness + CCT</td><td><span class="badge badge-success">Fixed</span></td></tr>
+        <tr><td>No top fill for large groups</td><td>Not addressed</td><td>Top mounting bar fabricated into tower cap for 2× Godox TL60 tubes</td><td><span class="badge badge-success">Added</span></td></tr>
+        <tr><td>No client branding</td><td>Fixed exterior</td><td>Recessed A3 graphic insert slot on side panel</td><td><span class="badge badge-success">Added</span></td></tr>
+        <tr><td>Printer overheating risk</td><td>Not addressed</td><td>Laser-perforated ventilation panels at printer section</td><td><span class="badge badge-success">Added</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ DIMENSIONS ═══════════ -->
+<div id="page-dimensions" class="page">
+<div class="content">
+  <div class="section-eyebrow">Physical specifications</div>
+  <div class="section-title">Dimensions &amp; layout</div>
+  <div class="section-desc">All measurements to give the fabricator. Every component position derives from the 145cm overall height.</div>
+
+  <div class="dimension-box">
+    <div class="dim-label">Overall enclosure — tower body only (updated)</div>
+    <div class="dim-val">Height: 152 cm &nbsp;&nbsp; Width: 44 cm &nbsp;&nbsp; Depth: 50 cm</div>
+    <div class="dim-note">+7cm vs previous 145cm — top mounting bar adds 6cm cap + 1cm clearance above camera</div>
+  </div>
+
+  <div class="dimension-box">
+    <div class="dim-label">Top strip light mounting bar</div>
+    <div class="dim-val">Width: 44 cm (full tower width) &nbsp;&nbsp; Height: 6 cm &nbsp;&nbsp; Depth: 8 cm</div>
+    <div class="dim-note">Welded cap on top of tower. Houses 2× Godox TL60 tubes side-by-side. Angled 30–40° forward and downward. Front face: open with frosted PC diffuser strip.</div>
+  </div>
+
+  <div class="dimension-box">
+    <div class="dim-label">Deployed width — tower + both fins</div>
+    <div class="dim-val">134 cm total (44cm tower + 45cm fin each side)</div>
+    <div class="dim-note">Fits sideways in Hiace with 28cm to spare</div>
+  </div>
+
+  <div class="svg-wrap">
+    <svg width="520" height="440" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M2 2L8 5L2 8" fill="none" stroke="#c4873a" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+
+      <!-- top strip light bar cap -->
+      <rect x="170" y="4" width="130" height="18" rx="4" fill="rgba(255,240,180,0.6)" stroke="#c4873a" stroke-width="1.5"/>
+      <text x="235" y="16" font-size="9" fill="#8a5c20" text-anchor="middle" font-family="Outfit,sans-serif">top strip bar · 2× TL60 · 30–40° fwd</text>
+
+      <!-- tower body -->
+      <rect x="170" y="22" width="130" height="340" rx="6" fill="#f5f3ee" stroke="#c4873a" stroke-width="1.5"/>
+
+      <!-- camera zone -->
+      <rect x="180" y="30" width="110" height="46" rx="3" fill="#e8e6e0" stroke="#d3d1c7" stroke-width="0.5"/>
+      <text x="235" y="57" font-size="11" fill="#6b6b65" text-anchor="middle" font-family="Outfit,sans-serif">camera · 140cm ht</text>
+
+      <!-- screen zone -->
+      <rect x="180" y="86" width="110" height="96" rx="3" fill="#e8e6e0" stroke="#d3d1c7" stroke-width="0.5"/>
+      <text x="235" y="138" font-size="11" fill="#6b6b65" text-anchor="middle" font-family="Outfit,sans-serif">touchscreen</text>
+
+      <!-- printer zone -->
+      <rect x="180" y="192" width="110" height="80" rx="3" fill="#e8e6e0" stroke="#d3d1c7" stroke-width="0.5"/>
+      <text x="235" y="236" font-size="11" fill="#6b6b65" text-anchor="middle" font-family="Outfit,sans-serif">printer (hidden)</text>
+
+      <!-- ventilation marks -->
+      <line x1="182" y1="275" x2="182" y2="271" stroke="#aaa" stroke-width="1.5"/>
+      <line x1="187" y1="275" x2="187" y2="271" stroke="#aaa" stroke-width="1.5"/>
+      <line x1="192" y1="275" x2="192" y2="271" stroke="#aaa" stroke-width="1.5"/>
+      <line x1="197" y1="275" x2="197" y2="271" stroke="#aaa" stroke-width="1.5"/>
+      <line x1="202" y1="275" x2="202" y2="271" stroke="#aaa" stroke-width="1.5"/>
+      <text x="220" y="270" font-size="9" fill="#999" font-family="Outfit,sans-serif">vent slots</text>
+
+      <!-- print slot -->
+      <rect x="190" y="278" width="90" height="8" rx="2" fill="#d3d1c7"/>
+      <text x="235" y="298" font-size="9" fill="#999" text-anchor="middle" font-family="Outfit,sans-serif">print exit slot</text>
+
+      <!-- mini PC zone -->
+      <rect x="180" y="308" width="110" height="42" rx="3" fill="#e8e6e0" stroke="#d3d1c7" stroke-width="0.5"/>
+      <text x="235" y="333" font-size="11" fill="#6b6b65" text-anchor="middle" font-family="Outfit,sans-serif">mini PC + cables</text>
+
+      <!-- feet -->
+      <rect x="172" y="360" width="126" height="8" rx="2" fill="#d3d1c7"/>
+
+      <!-- operator side panel cut -->
+      <rect x="300" y="220" width="6" height="60" rx="2" fill="#c4873a" opacity="0.6"/>
+      <text x="320" y="245" font-size="10" fill="#c4873a" font-family="Outfit,sans-serif">operator</text>
+      <text x="320" y="258" font-size="10" fill="#c4873a" font-family="Outfit,sans-serif">access panel</text>
+
+      <!-- CCT + brightness knobs -->
+      <circle cx="306" cy="160" r="5" fill="none" stroke="#c4873a" stroke-width="1.5"/>
+      <circle cx="306" cy="178" r="5" fill="none" stroke="#c4873a" stroke-width="1.5"/>
+      <text x="320" y="164" font-size="9" fill="#c4873a" font-family="Outfit,sans-serif">CCT knob</text>
+      <text x="320" y="182" font-size="9" fill="#c4873a" font-family="Outfit,sans-serif">dim knob</text>
+
+      <!-- A3 graphic slot -->
+      <rect x="170" y="100" width="6" height="60" rx="1" fill="#2563a8" opacity="0.5"/>
+      <text x="152" y="125" font-size="9" fill="#2563a8" text-anchor="end" font-family="Outfit,sans-serif">A3 insert</text>
+      <text x="152" y="138" font-size="9" fill="#2563a8" text-anchor="end" font-family="Outfit,sans-serif">slot</text>
+
+      <!-- left fin (folded flat against side) -->
+      <path d="M170 58 L100 70 L100 195 L170 190 Z" fill="#ddeaf8" stroke="#2563a8" stroke-width="1" opacity="0.7"/>
+      <text x="135" y="132" font-size="10" fill="#2563a8" text-anchor="middle" font-family="Outfit,sans-serif">fin L</text>
+      <text x="135" y="145" font-size="9" fill="#2563a8" text-anchor="middle" font-family="Outfit,sans-serif">45cm</text>
+
+      <!-- right fin -->
+      <path d="M300 58 L370 70 L370 195 L300 190 Z" fill="#ddeaf8" stroke="#2563a8" stroke-width="1" opacity="0.7"/>
+      <text x="335" y="132" font-size="10" fill="#2563a8" text-anchor="middle" font-family="Outfit,sans-serif">fin R</text>
+      <text x="335" y="145" font-size="9" fill="#2563a8" text-anchor="middle" font-family="Outfit,sans-serif">45cm</text>
+
+      <!-- LED panel inside fin -->
+      <rect x="104" y="82" width="56" height="90" rx="2" fill="rgba(255,240,180,0.5)" stroke="#c4873a" stroke-width="0.5"/>
+      <text x="132" y="131" font-size="9" fill="#8a5c20" text-anchor="middle" font-family="Outfit,sans-serif">LED panel</text>
+      <rect x="313" y="82" width="50" height="90" rx="2" fill="rgba(255,240,180,0.5)" stroke="#c4873a" stroke-width="0.5"/>
+      <text x="338" y="131" font-size="9" fill="#8a5c20" text-anchor="middle" font-family="Outfit,sans-serif">LED panel</text>
+
+      <!-- height dimension -->
+      <line x1="430" y1="4" x2="430" y2="360" stroke="#c4873a" stroke-width="0.5" stroke-dasharray="3 3" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+      <text x="444" y="190" font-size="11" fill="#c4873a" font-family="DM Mono,monospace">152cm</text>
+
+      <!-- width dimension -->
+      <line x1="100" y1="400" x2="370" y2="400" stroke="#6b6b65" stroke-width="0.5" stroke-dasharray="3 3" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+      <text x="235" y="420" font-size="11" fill="#6b6b65" text-anchor="middle" font-family="DM Mono,monospace">134cm deployed</text>
+
+      <!-- tower width dimension -->
+      <line x1="170" y1="385" x2="300" y2="385" stroke="#c4873a" stroke-width="0.5" stroke-dasharray="2 3" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+      <text x="235" y="397" font-size="10" fill="#c4873a" text-anchor="middle" font-family="DM Mono,monospace">44cm</text>
+    </svg>
+  </div>
+
+  <div class="stag">Component height map</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Component</th><th>Height from floor</th><th>Internal slot height</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Top strip light bar (cap)</strong></td><td>145–152 cm</td><td>6cm tall × 44cm wide × 8cm deep cap</td><td>Houses 2× Godox TL60. Angled 30–40° forward. Frosted PC diffuser on front face.</td></tr>
+        <tr><td><strong>Camera aperture centre</strong></td><td>140 cm</td><td>46 cm slot from top of tower body</td><td>Slightly upward angle — flattering for groups</td></tr>
+        <tr><td><strong>Touchscreen centre</strong></td><td>105 cm</td><td>96 cm slot</td><td>Comfortable tapping height for most adults</td></tr>
+        <tr><td><strong>Operator knobs (CCT + dim)</strong></td><td>~110 cm</td><td>Side panel</td><td>Recessed flush into right face of tower</td></tr>
+        <tr><td><strong>Operator access panel</strong></td><td>80–140 cm</td><td>60 cm tall panel</td><td>Side face, waist to shoulder height. Mini PC accessible.</td></tr>
+        <tr><td><strong>Print exit slot</strong></td><td>83 cm</td><td>8 mm slot</td><td>225mm wide + 5mm clearance</td></tr>
+        <tr><td><strong>Printer (hidden)</strong></td><td>65–83 cm</td><td>80 cm compartment</td><td>DNP DS-RX1HS: 32×35×28cm + clearance</td></tr>
+        <tr><td><strong>Mini PC shelf</strong></td><td>35–52 cm</td><td>42 cm slot</td><td>Beelink / NUC: ~12×12×5cm</td></tr>
+        <tr><td><strong>A3 graphic insert slot</strong></td><td>53–95 cm</td><td>Left face of tower</td><td>Swappable per-client branding</td></tr>
+        <tr><td><strong>Fin LED panel centre</strong></td><td>90–145 cm from floor</td><td>Spans fin height</td><td>60cm tall LED panel inside fin cavity</td></tr>
+        <tr class="tot"><td>Tower base (feet)</td><td>0–8 cm</td><td>—</td><td>4× adjustable rubber levelling feet</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stag">Cutout specifications for fabricator</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Cutout</th><th>Dimensions</th><th>Panel</th><th>Special requirement</th></tr></thead>
+      <tbody>
+        <tr><td>Top strip bar — front diffuser opening</td><td>420 × 52 mm</td><td>Top cap front face</td><td>3mm frosted PC sheet press-fit. Full width of tower. Bar angled forward 30–40° by fabricator.</td></tr>
+        <tr><td>Top strip bar — power cable pass-through</td><td>20 × 20 mm</td><td>Top cap rear into tower</td><td>Rubber grommet. TL60 AC adapter cable routes down into internal power strip.</td></tr>
+        <tr><td>Camera aperture</td><td>100 × 80 mm</td><td>Front</td><td>Centred horizontally. Canon R50 lens ~65mm diameter.</td></tr>
+        <tr><td>Touchscreen opening</td><td>390 × 230 mm</td><td>Front</td><td>ASUS VT168HR bezel + 5mm clearance all sides</td></tr>
+        <tr><td>Print exit slot</td><td>225 × 10 mm</td><td>Front</td><td>Smooth rolled edge — no sharp lip to snag prints</td></tr>
+        <tr><td>Operator side panel</td><td>60cm H × 14cm W</td><td>Right side</td><td>Full hinge + magnetic flush latch. No handle — push-to-open.</td></tr>
+        <tr><td>CCT knob aperture</td><td>22 mm diameter × 2</td><td>Right side</td><td>Above operator panel. Flush-mount rotary encoder holes.</td></tr>
+        <tr><td>A3 insert slot</td><td>305 × 435 mm (A3 + 2mm)</td><td>Left side</td><td>Recessed 3mm channel with lip. Card slides in from top.</td></tr>
+        <tr><td>Ventilation perforations</td><td>12 rows × 20 holes</td><td>Both sides, printer zone</td><td>4mm holes, 8mm centres. Laser perforated — looks premium.</td></tr>
+        <tr><td>Rear access door</td><td>Full height × full depth</td><td>Rear</td><td>Full-height hinged panel, magnetic latch, no external handle</td></tr>
+        <tr><td>Power cable exit</td><td>25 × 25 mm</td><td>Rear base</td><td>Rubber grommet. Single IEC cord exits here.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FIN SYSTEM ═══════════ -->
+<div id="page-fins" class="page">
+<div class="content">
+  <div class="section-eyebrow">Wing fin system</div>
+  <div class="section-title">Fin design, hinge and transport</div>
+  <div class="section-desc">The definitive specification after testing fin spread vs. coverage and transport constraints.</div>
+
+  <div class="fin-note">
+    Final spec: 45cm fins · single-knuckle 180° hinge · 30–35° inward stop tab · folds flat for Hiace transport. Do NOT use 55cm fins with this hinge — at 55cm use detachable pin system instead.
+  </div>
+
+  <div class="two-col">
+    <div class="card featured">
+      <span class="badge badge-accent">Recommended</span>
+      <div class="card-title">45cm fins — hinged fold</div>
+      <div class="card-sub">Single-knuckle 180° piano hinge with welded stop tab at 30–35° inward</div>
+      <div class="spec-grid">
+        <div class="sr"><span class="sk">Fin length</span><span>45 cm each side</span></div>
+        <div class="sr"><span class="sk">Deployed width</span><span>134 cm total</span></div>
+        <div class="sr"><span class="sk">Packed width</span><span>44 cm (tower only)</span></div>
+        <div class="sr"><span class="sk">Hinge type</span><span>180° piano hinge, full-length</span></div>
+        <div class="sr"><span class="sk">Stop tab angle</span><span>30–35° inward (welded)</span></div>
+        <div class="sr"><span class="sk">Setup time</span><span>~30 sec — fold out, click stop</span></div>
+        <div class="sr"><span class="sk">Light separation</span><span>~90 cm (fins deployed)</span></div>
+        <div class="sr"><span class="sk">Coverage @ 1.5m</span><span>~130 cm — sufficient for 4 pax</span></div>
+      </div>
+      <div class="why">The stop tab is a steel block welded inside the hinge at 30–35°. When the fin opens to that angle it hits the stop and cannot open further — no bolts, no tools, no fiddling at the venue. Fold it out until it clicks. Done.</div>
+    </div>
+    <div class="card">
+      <span class="badge badge-neu">If 55cm fins are chosen instead</span>
+      <div class="card-title">55cm fins — detachable pin system</div>
+      <div class="card-sub">Fins do not fold — they unplug entirely via pull-pin receiver brackets</div>
+      <div class="spec-grid">
+        <div class="sr"><span class="sk">Fin length</span><span>55 cm each side</span></div>
+        <div class="sr"><span class="sk">Deployed width</span><span>154 cm total</span></div>
+        <div class="sr"><span class="sk">Transport</span><span>Fins travel separately in van</span></div>
+        <div class="sr"><span class="sk">Connection</span><span>Male socket on fin → female bracket on tower</span></div>
+        <div class="sr"><span class="sk">Lock</span><span>2× pull-pins per fin</span></div>
+        <div class="sr"><span class="sk">Setup time</span><span>~90 sec per fin</span></div>
+        <div class="sr"><span class="sk">Coverage @ 1.5m</span><span>~155 cm — excellent for 5+ pax</span></div>
+      </div>
+      <div class="why">More coverage, but more complexity. Two fin panels to carry, load and attach per event. Bracket fabrication adds ~S$150–250 to the build cost. Only worth it if doing large-group events of 5+ people regularly.</div>
+    </div>
+  </div>
+
+  <div class="stag">Fin construction specification</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Element</th><th>Spec</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fin shell material</strong></td><td>1.5mm aluminium — same as tower body</td><td>Consistent finish and weight across the full unit</td></tr>
+        <tr><td><strong>Fin dimensions (each)</strong></td><td>45cm W × 60cm H × 8cm D</td><td>Depth accommodates LED panel (4–5cm) + wiring</td></tr>
+        <tr><td><strong>Front face</strong></td><td>Open — frosted polycarbonate diffuser panel</td><td>3mm frosted PC sheet, press-fit or screwed in. Diffuses LED, looks premium.</td></tr>
+        <tr><td><strong>LED panel mounting</strong></td><td>Flat panel mounted on internal rear face of fin</td><td>4× M4 screws. Leave 2cm air gap between panel and diffuser for heat.</td></tr>
+        <tr><td><strong>Cable routing</strong></td><td>2× cable pass-throughs at hinge edge</td><td>Power + CCT/dim signal run through hinge into tower. Use spiral cable wrap.</td></tr>
+        <tr><td><strong>Piano hinge</strong></td><td>Full-length, 180° rotation, stainless steel</td><td>Full-length hinge distributes load evenly. No point hinge — will loosen over time.</td></tr>
+        <tr><td><strong>Stop tab</strong></td><td>Welded steel block inside hinge at 30–35°</td><td>Fabricator welds after confirming exact angle with you on prototype fit-check.</td></tr>
+        <tr><td><strong>Ventilation</strong></td><td>6× 8mm holes on rear face of fin</td><td>LED panels generate heat. Minimal but necessary ventilation.</td></tr>
+        <tr><td><strong>Powder coat</strong></td><td>Same RAL colour as tower body</td><td>Both fins and tower coated together for colour consistency.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ LIGHTING ═══════════ -->
+<div id="page-lighting" class="page">
+<div class="content">
+  <div class="section-eyebrow">Lighting system</div>
+  <div class="section-title">LED panels, coverage and controls</div>
+  <div class="section-desc">Flat bicolour LED panels replace the Godox SL60W softboxes. External operator controls for brightness and CCT.</div>
+
+  <div class="card featured">
+    <span class="badge badge-accent">Recommended panels</span>
+    <div class="card-title">Viltrox VL-60B or Godox LiteMax 60 — bicolour flat LED panel × 2</div>
+    <div class="card-sub">60W · 3200–5600K · ~4cm deep · fits inside 8cm fin cavity</div>
+    <div class="spec-grid">
+      <div class="sr"><span class="sk">Power</span><span>60W per panel</span></div>
+      <div class="sr"><span class="sk">CCT range</span><span>3200K–5600K (bicolour)</span></div>
+      <div class="sr"><span class="sk">CRI</span><span>95+ — skin tones look natural</span></div>
+      <div class="sr"><span class="sk">Depth</span><span>~4 cm — fits 8cm fin cavity easily</span></div>
+      <div class="sr"><span class="sk">Panel size</span><span>~30 × 20 cm (fits 45cm fin width)</span></div>
+      <div class="sr"><span class="sk">Price in SG</span><span>S$120–180 each · Shopee / Lazada</span></div>
+    </div>
+    <div class="why">Bicolour is the key spec — one panel covers the full 3200K–5600K range. No separate warm and cool panels needed. The built-in CCT and dimmer circuit can be driven by external rotary encoders wired in parallel — this is how the operator knobs on the tower side work.</div>
+  </div>
+
+  <div class="stag">Why the original Godox SL60W softboxes cannot be used</div>
+  <div class="card danger">
+    <div style="font-size:13px;color:var(--danger);line-height:1.65;">The SL60W is a cylindrical lamp head with a Bowens mount — it requires a 25cm-deep cavity minimum when paired with a softbox. The fin cavity is 8cm deep. Additionally the SL60W has an active cooling fan that exhausts heat rearward — this fan would be blocked inside a sealed fin. Flat LED panels are the correct replacement: same light quality, 4cm deep, passive or low-noise cooling.</div>
+  </div>
+
+  <div class="stag">Optimal lighting parameters at 1.5m shooting distance</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Parameter</th><th>Value</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr class="good"><td><strong>Fin spread</strong></td><td>45 cm each side</td><td>Light centres ~90cm apart — wraps around subjects naturally</td></tr>
+        <tr class="good"><td><strong>Fin angle inward</strong></td><td>30–35° (fixed stop tab)</td><td>Creates flattering 45° key light angle relative to camera axis</td></tr>
+        <tr class="good"><td><strong>Wattage</strong></td><td>60–80W per panel</td><td>~400–600 lux at subject face — ideal for photobooth printing</td></tr>
+        <tr><td><strong>CCT for birthday / weddings</strong></td><td>4000–4500K</td><td>Warm-neutral — flattering, feels celebratory</td></tr>
+        <tr><td><strong>CCT for corporate</strong></td><td>5000–5600K</td><td>Cool-white — clean, professional look</td></tr>
+        <tr><td><strong>Brightness</strong></td><td>70–90% for most venues</td><td>Lower for bright venues to avoid overexposure</td></tr>
+        <tr><td><strong>Coverage at 1.5m</strong></td><td>~130 cm wide</td><td>Comfortable for 2–4 people standing together</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stag">External operator control system</div>
+  <div class="card">
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Two recessed rotary knobs on the right face of the tower at ~110cm height.</strong> One controls brightness (PWM dimmer), one controls CCT. Both are flush-mounted — no protrusion — and operate both panels simultaneously via a parallel wiring run through the hinge cables.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Hardware needed:</strong> 2× rotary encoder with push-button (Shopee, ~S$5 each), 1× PWM LED dimmer controller (~S$15–20), 1× bicolour CCT controller (~S$20–30). Total ~S$45–60 in control hardware. Fabricator cuts the 22mm apertures; you wire the controllers into the circuit.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>At events:</strong> Turn CCT warm for birthday/wedding vibes, cool for corporate. Reduce brightness if the venue already has strong ambient light to avoid washed-out prints. Takes 5 seconds to adjust between sessions.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Cable routing:</strong> LED panel power and control signals pass through the piano hinge via a spiral-wrapped 2-core cable. Use 1.5mm² cable minimum for the power run. When fin is folded, cable loops loosely inside the hinge — no strain on connectors.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ LAPTOP ACCESS ═══════════ -->
+<div id="page-access" class="page">
+<div class="content">
+  <div class="section-eyebrow">Operator access</div>
+  <div class="section-title">Laptop / mini PC access</div>
+  <div class="section-desc">The original sealed design was identified as a problem. Three solutions — choose based on your preference.</div>
+
+  <div class="fin-note">
+    Why access matters mid-event: rebooting LumaBooth if it freezes, switching session modes, checking WiFi, clearing storage, responding to Windows pop-ups, swapping SD cards, connecting USB drives for overlay templates.
+  </div>
+
+  <div class="access-grid">
+    <div class="access-card rec">
+      <span class="badge badge-accent">Recommended</span>
+      <div class="access-title">Option A — operator side panel</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-top:4px;">A dedicated lockable panel on the right face of the tower at waist height (80–140cm) exposes just the mini PC shelf. Push-to-open magnetic latch — no handle visible. Guests never see it from the front. You reach in, adjust, close in seconds.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--accent-dark);font-weight:600;">Add-on cost: S$80–150</div>
+    </div>
+    <div class="access-card">
+      <span class="badge badge-neu">Good ergonomics</span>
+      <div class="access-title">Option B — pull-out drawer shelf</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-top:4px;">Mini PC sits on a slide-out drawer that pulls forward from the rear of the tower on drawer runners. Pull it out to access, push it back when done. Most ergonomic solution. Fabricators build these for equipment consoles regularly.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);font-weight:600;">Add-on cost: S$150–200</div>
+    </div>
+    <div class="access-card">
+      <span class="badge badge-neu">Simplest</span>
+      <div class="access-title">Option C — mini PC external</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-top:4px;">Mini PC sits on a small shelf behind the tower, not inside it. All cables run through a managed channel into the tower base. Always accessible. Simplest to build — nothing extra to fabricate. Mini PC is hidden behind the unit.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);font-weight:600;">Add-on cost: S$0 (simpler build)</div>
+    </div>
+  </div>
+
+  <div class="stag" style="margin-top:20px;">Why a mini PC instead of a laptop</div>
+  <div class="card">
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Height saving:</strong> A laptop takes up 25–30cm of internal vertical space. A Beelink SER mini PC or Intel NUC is 12×12×5cm — saves significant height and lets the tower stay at 145cm rather than requiring 170cm+.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Recommended models:</strong> Beelink SER5 Pro (AMD Ryzen 5 5600H, 16GB RAM, ~S$280 on Lazada) or Beelink EQ12 (Intel N100, 8GB RAM, ~S$180). Both run LumaBooth flawlessly. Windows 11 Pro pre-installed.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Operator interface:</strong> Pair with a compact Bluetooth keyboard-trackpad combo (~S$40 on Shopee) that hangs on a hook inside the rear door or operator panel. You only need it for initial setup and mid-event adjustments — not continuously.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Display output:</strong> The mini PC drives the ASUS touchscreen via HDMI + USB-A (for touch data). The operator side panel does not need a screen — you check the touchscreen for feedback or use a phone with Booth CoPilot remote app for most adjustments.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Boot and update discipline:</strong> Disable Windows automatic updates before every event. Set the mini PC to boot LumaBooth on startup. This means power-on at the venue → LumaBooth ready in ~45 seconds → no operator intervention needed.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ MATERIALS ═══════════ -->
+<div id="page-materials" class="page">
+<div class="content">
+  <div class="section-eyebrow">Material specification</div>
+  <div class="section-title">What to build it from</div>
+  <div class="section-desc">Aluminium is the definitive choice. Here is the full specification for the fabricator.</div>
+
+  <div class="three-col">
+    <div class="card featured">
+      <span class="badge badge-accent">Specified</span>
+      <div class="card-title">1.5mm aluminium sheet</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.65;">Strong, light (~15–20kg empty shell), corrosion-resistant, powder-coats beautifully. Standard for kiosk fabrication in Singapore.</div>
+    </div>
+    <div class="card">
+      <span class="badge badge-neu">Not recommended</span>
+      <div class="card-title">Mild steel 1.5–2mm</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.65;">Cheaper but heavier (~25–35kg shell). Must be powder-coated or rusts in SG humidity. Acceptable budget option.</div>
+    </div>
+    <div class="card">
+      <span class="badge badge-neu">Premium option</span>
+      <div class="card-title">Stainless steel 1.5mm</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.65;">Most premium look. Brushed finish needs no coating. Heaviest option (~30–40kg). Only if doing ultra-premium events.</div>
+    </div>
+  </div>
+
+  <div class="stag">Recommended finish options</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Finish</th><th>Description</th><th>Add-on cost</th><th>Best for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Matte powder coat — RAL 9005 black</strong></td><td>Flat black, premium, hides fingerprints</td><td>Included</td><td>Corporate, dark-themed events</td></tr>
+        <tr><td><strong>Gloss powder coat — RAL 9003 white</strong></td><td>Bright, clean, reflective</td><td>Included</td><td>Weddings, bridal showers</td></tr>
+        <tr><td><strong>Brushed aluminium + anodise</strong></td><td>Industrial-premium, no paint</td><td>+S$300–600</td><td>High-end corporate, product launches</td></tr>
+        <tr><td><strong>Vinyl wrap over powder coat</strong></td><td>Full-colour branding or pattern</td><td>+S$150–300</td><td>Seasonal theming, client branding</td></tr>
+        <tr><td><strong>Laser-engraved logo</strong></td><td>Your brand cut into panel, contrast fill</td><td>+S$80–150</td><td>Permanent brand identity</td></tr>
+        <tr class="good"><td><strong>Swappable A3 graphic insert slot</strong></td><td>Recessed slot — client artwork slides in/out</td><td>+S$50–100 (slot fab)</td><td>Per-event customisation — strong upsell</td></tr>
+      </tbody>
+    </table>
+    <div class="why" style="margin-top:10px;">The A3 swappable slot is a high-value add. A printed A3 card with the client's wedding monogram or corporate logo on the side of the booth is a genuinely impressive touch. Clients willingly pay S$30–50 extra per event for it. Print cost to you: under S$5 at any print shop.</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FABRICATORS ═══════════ -->
+<div id="page-fabricators" class="page">
+<div class="content">
+  <div class="section-eyebrow">Where to build it</div>
+  <div class="section-title">Singapore fabricators</div>
+  <div class="section-desc">Four vetted options with specific relevance to this type of project.</div>
+
+  <div class="card featured">
+    <span class="badge badge-accent">Top recommendation</span>
+    <div class="card-title">Sunny Metal &amp; Engineering</div>
+    <div class="card-sub">Toa Payoh · Est. 1974 · Laser cutting, bending, welding, powder coating, laser engraving in-house</div>
+    <div class="spec-grid">
+      <div class="sr"><span class="sk">Speciality</span><span>Electronic consoles, kiosks, wall cabinets — exactly this project type</span></div>
+      <div class="sr"><span class="sk">Why best fit</span><span>50 years building exactly the type of enclosure you need. Full in-house workflow.</span></div>
+      <div class="sr"><span class="sk">Location</span><span>Toa Payoh — central SG, easy to visit</span></div>
+      <div class="sr"><span class="sk">Website</span><span>sunnymetal.com · Free consultation</span></div>
+    </div>
+  </div>
+
+  <div class="card info">
+    <span class="badge badge-info">Also recommended</span>
+    <div class="card-title">Anderco Pte Ltd</div>
+    <div class="card-sub">Island-wide · CNC laser cutting, waterjet, press brake bending, powder coating, polishing</div>
+    <div class="spec-grid">
+      <div class="sr"><span class="sk">Speciality</span><span>Architectural metalwork, enclosures, precision fabrication</span></div>
+      <div class="sr"><span class="sk">Notable work</span><span>Changi Airport annex, MRT stations, Resorts World Sentosa</span></div>
+      <div class="sr"><span class="sk">Website</span><span>anderco.com.sg · Online quote form</span></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Iron-Man Fabrication Pte Ltd</div>
+      <div class="card-sub">Aluminium and stainless steel specialist · custom one-offs · free consultation · ironman.com.sg</div>
+      <div class="why">Smaller shop — more flexible for single prototype iterations. Good option if larger fabricators have long lead times.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">STACK Store Singapore</div>
+      <div class="card-sub">Electronic enclosure specialist — serves marine, telco, electrical industries · stack-store.com</div>
+      <div class="why">Specialises in enclosures for electronic equipment. Your photobooth tower with internal electronics is precisely their use case.</div>
+    </div>
+  </div>
+
+  <div class="stag">Before approaching any fabricator — get drawings first</div>
+  <div class="card warn">
+    <div class="tip-row"><div class="dot da"></div><div><strong>Freelance CAD draughtsperson (Upwork / Fiverr / Carousell SG)</strong> — S$80–200 one-time. Converts your sketch and component measurements into dimensioned 2D DXF/DWG technical drawings. Do not approach fabricators without proper drawings — they cannot quote accurately without them. Allow 1 week for 2–5 revision rounds.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Skyy Design Workshop (skyydesign.com.sg)</strong> — Event fabrication specialists who can design and manage the full build as a turnkey project. More expensive but they handle everything including specification review.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ BUILD PROCESS ═══════════ -->
+<div id="page-process" class="page">
+<div class="content">
+  <div class="section-eyebrow">How to commission the build</div>
+  <div class="section-title">Step-by-step build process</div>
+  <div class="section-desc">From first measurement to first event. Allow 4–8 weeks total.</div>
+
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Do 10–15 paid events first</div>
+        <div class="step-desc">Non-negotiable. Real setup experience tells you exactly where screen height feels wrong, where the print slot needs to be, what needs faster access. Building too early permanently locks in mistakes.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Physically measure every component</div>
+        <div class="step-desc">DNP printer (32×35×28cm), ASUS VT168HR bezel, Canon R50 lens diameter (~65mm), Beelink mini PC (~12×12×5cm), Viltrox VL-60B panel (~30×20×4cm). Add 10–15mm clearance all sides. No fabricator can work from estimates.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Create concept sketch and reference board</div>
+        <div class="step-desc">Draw front, side, and back views — even by hand. Mark all component positions and heights. Collect 5–10 reference images of premium photobooth enclosures or kiosks on Pinterest. This is what you bring to the fabricator consultation to eliminate ambiguity.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Commission DXF/DWG technical drawings</div>
+        <div class="step-desc">Hire a freelance CAD draughtsperson on Upwork or Fiverr (S$80–200). Convert sketch + measurements into dimensioned 2D drawings. This is what the fabricator cuts from. Allow 1 week for 2–5 revision rounds. Do not skip.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Get written quotes from 2–3 fabricators</div>
+        <div class="step-desc">Bring CAD drawings and reference images to Sunny Metal, Anderco, and one other. Ask for: material/thickness recommendation, timeline, finish options, revision process, and whether a bare-metal fit check before powder coating is included. Get itemised written quotes — fabrication, finishing, delivery, separately.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Confirm RAL colour and request a powder coat swatch</div>
+        <div class="step-desc">Choose your RAL number before signing off. Recommended choices: RAL 9005 (matte black), RAL 9003 (signal white), RAL 9006 (white aluminium metallic), RAL 7021 (black grey). Request a physical sample panel from Sunny Metal — colours differ significantly on screen vs real metal.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Bare-metal fit check before any finishing</div>
+        <div class="step-desc">Ask fabricator to assemble the unpainted shell and let you mount all equipment before powder coating. Verify screen position, camera height, print slot alignment, fin hinge angle, and operator panel clearance. Fix anything needed, then approve for finishing. This step costs nothing extra if agreed upfront.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <div class="step-title">Internal fit-out — do this yourself</div>
+        <div class="step-desc">Once finished shell is delivered: install VESA monitor bracket, printer shelf with rubber mounts, mini PC shelf, LED panel wiring through hinge cables, internal 4-gang power strip, cable management channels (velcro ties, not zip ties), CCT and dimmer control knobs. Budget a weekend. Test everything before booking an event.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <div class="step-title">Branding and full dry-run test</div>
+        <div class="step-desc">Apply logo vinyl decal or laser-engraved panel. Make an A3 insert for the graphic slot. Then do a complete dry-run at home — full setup, run LumaBooth, fire the printer 20+ times, test QR sharing, fold and unfold fins 5 times, open every panel. Do not take it to a paid event until this passes twice.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ COST ═══════════ -->
+<div id="page-cost" class="page">
+<div class="content">
+  <div class="section-eyebrow">Financial overview</div>
+  <div class="section-title">Full cost breakdown</div>
+  <div class="section-desc">All costs for the complete updated Option B enclosure — tower body, fins, lighting, access system and fit-out.</div>
+
+  <div class="card">
+    <div class="stag">Design and drawings</div>
+    <div class="row"><div class="rl"><strong>Freelance CAD drawings (DXF/DWG)</strong><span>Upwork / Fiverr / Carousell SG</span></div><div class="rv">S$80–200</div></div>
+
+    <div class="stag" style="margin-top:16px;">Fabrication — 1.5mm aluminium tower + fins</div>
+    <div class="row"><div class="rl"><strong>Laser cutting + CNC bending — all tower panels</strong><span>All cutouts: screen, camera, print slot, ventilation, operator panel, A3 slot</span></div><div class="rv">S$400–700</div></div>
+    <div class="row"><div class="rl"><strong>TIG welding + assembly — tower frame + brackets</strong><span>Printer shelf, mini PC shelf, internal mounting points, cable channels</span></div><div class="rv">S$300–500</div></div>
+    <div class="row"><div class="rl"><strong>Rear access door + hinges + magnetic latch</strong><span>Full-height hinged panel with push-to-open magnetic closure</span></div><div class="rv">S$150–250</div></div>
+    <div class="row"><div class="rl"><strong>Wing fins ×2 — shells + piano hinges + stop tabs</strong><span>45cm × 60cm × 8cm each. Full-length piano hinge. Welded angle stop at 30–35°.</span></div><div class="rv">S$250–450</div></div>
+    <div class="row"><div class="rl"><strong>Operator side access panel + magnetic latch</strong><span>60cm × 14cm flush-mount panel in right face of tower</span></div><div class="rv">S$80–150</div></div>
+    <div class="row"><div class="rl"><strong>A3 graphic insert slot (recessed channel)</strong><span>Left face of tower. 305×435mm opening with 3mm lip channel.</span></div><div class="rv">S$50–100</div></div>
+    <div class="row"><div class="rl"><strong>Levelling feet ×4 (heavy-duty adjustable rubber)</strong><span>Stability on uneven venue floors</span></div><div class="rv">S$30–60</div></div>
+    <div class="row"><div class="rl"><strong>Top strip light mounting bar (welded cap)</strong><span>44cm W × 6cm H × 8cm D. Angled 30–40° forward. Front face open with frosted PC diffuser slot. Cable pass-through to internal power strip. Adds 7cm to overall height.</span></div><div class="rv">S$80–150</div></div>
+
+    <div class="stag" style="margin-top:16px;">Surface finish</div>
+    <div class="row"><div class="rl"><strong>Powder coating — full enclosure including fins (RAL colour)</strong><span>Matte or gloss. Sunny Metal or Anderco in-house.</span></div><div class="rv">S$250–450</div></div>
+    <div class="row"><div class="rl"><strong>Laser-engraved logo on one panel</strong><span>Brand name or logo cut into aluminium, contrast colour fill</span></div><div class="rv">S$80–150</div></div>
+
+    <div class="stag" style="margin-top:16px;">Lighting — inside fins</div>
+    <div class="row"><div class="rl"><strong>Viltrox VL-60B or Godox LiteMax 60 LED panel ×2</strong><span>60W bicolour · 3200–5600K · CRI 95+ · Shopee / Lazada SG</span></div><div class="rv">S$240–360</div></div>
+    <div class="row"><div class="rl"><strong>Frosted polycarbonate diffuser panels ×2</strong><span>3mm PC sheet cut to fin opening size. Local plastic suppliers or Shopee.</span></div><div class="rv">S$40–80</div></div>
+    <div class="row"><div class="rl"><strong>PWM dimmer + CCT controller + rotary knobs</strong><span>Operator-accessible controls recessed in tower side</span></div><div class="rv">S$45–70</div></div>
+    <div class="row"><div class="rl"><strong>Cable routing — spiral wrap + grommets + connectors</strong><span>Through-hinge wiring for both fins</span></div><div class="rv">S$20–40</div></div>
+
+    <div class="row"><div class="rl"><strong>Godox TL60 RGB tube light × 2 — top fill bar</strong><span>2× 75cm tubes spliced = 150cm fill bar. Seated in top mounting cap. 2700–6500K · CRI 96. Amazon SG / Shopee SG.</span></div><div class="rv">S$150–180</div></div>
+    <div class="row"><div class="rl"><strong>Frosted PC diffuser strip for top bar</strong><span>420 × 52mm strip, 3mm frosted polycarbonate. Press-fits into top bar front face opening.</span></div><div class="rv">S$10–20</div></div>
+
+    <div class="stag" style="margin-top:16px;">Internal fit-out (DIY sourced parts)</div>
+    <div class="row"><div class="rl"><strong>VESA monitor mount bracket (adjustable)</strong><span>Mounts ASUS VT168HR at correct height. Shopee.</span></div><div class="rv">S$30–60</div></div>
+    <div class="row"><div class="rl"><strong>Beelink SER5 Pro or EQ12 mini PC</strong><span>Replaces laptop. AMD Ryzen 5 / Intel N100 · 16GB RAM · Win 11</span></div><div class="rv">S$180–280</div></div>
+    <div class="row"><div class="rl"><strong>Compact Bluetooth keyboard-trackpad combo</strong><span>For operator access. Stores in rear door panel or operator panel. Shopee.</span></div><div class="rv">S$35–50</div></div>
+    <div class="row"><div class="rl"><strong>Slim 4-gang power strip + velcro cable ties</strong><span>Internal. One IEC cord exits at base. Printer, monitor, mini PC, router.</span></div><div class="rv">S$25–45</div></div>
+    <div class="row"><div class="rl"><strong>Rubber vibration mounts for printer shelf</strong><span>Prevents DNP rattling during transport</span></div><div class="rv">S$15–30</div></div>
+    <div class="row"><div class="rl"><strong>Vinyl logo decal (if not laser-engraved)</strong><span>Custom-cut vinyl from Shopee. S$30–60.</span></div><div class="rv">S$30–60</div></div>
+
+    <div class="total-bar">
+      <span class="lb">Total build cost — aluminium, matte powder coat, fins, LED panels, mini PC</span>
+      <span class="vl">S$2,590–4,185</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.8;">
+      Budget version (mild steel, no engraving, no mini PC): ~S$1,500–2,200<br>
+      Premium version (brushed aluminium + anodise + stainless fittings): ~S$3,500–5,000<br>
+      Break-even: ~3–4 premium bookings at S$180–220/hr (vs previous S$120/hr)
+    </div>
+  </div>
+
+  <div class="stag">What the enclosure does to your pricing</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Scenario</th><th>Build cost</th><th>New rate</th><th>Sessions to break even</th></tr></thead>
+      <tbody>
+        <tr><td>Mid-range aluminium build</td><td>S$2,800</td><td>S$160–180/hr</td><td>~6–8 sessions at new rate</td></tr>
+        <tr><td>Premium aluminium + anodise</td><td>S$3,800</td><td>S$200–250/hr</td><td>~5–6 sessions at new rate</td></tr>
+        <tr class="tot"><td>Conclusion</td><td colspan="3">The enclosure pays back in 3–4 bookings. Every session after that is pure margin increase vs. the bare-stand setup.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ TIPS ═══════════ -->
+<div id="page-tips" class="page">
+<div class="content">
+  <div class="section-eyebrow">Critical guidance</div>
+  <div class="section-title">Practical tips</div>
+  <div class="section-desc">Everything learned from the full planning conversation — the things that will save you from expensive mistakes.</div>
+
+  <div class="card">
+    <div class="stag">Before you build</div>
+    <div class="tip-row"><div class="dot dr"></div><div><strong>Do not build the enclosure until after 10–15 paid events.</strong> After real events you will know exactly where the screen height feels wrong, where the print slot should be, and what needs quicker access mid-event. Building too early permanently locks mistakes into metal.</div></div>
+    <div class="tip-row"><div class="dot dr"></div><div><strong>Do a bare-metal fit check before powder coating.</strong> Always ask the fabricator to assemble the raw shell and let you mount all equipment before any finishing. Discovering a 3mm misalignment after painting is expensive. It costs nothing extra if agreed upfront.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Budget 4–8 weeks total from first fabricator contact to finished unit.</strong> Allow for 2–3 revision rounds, the fit check, powder coat lead time, and your own fit-out work. Do not commit the enclosure to a specific event booking until you have dry-run tested it twice.</div></div>
+
+    <div class="stag" style="margin-top:16px;">Design decisions</div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>45cm fins with hinged fold is the right call.</strong> 55cm gives slightly more coverage but requires a detachable pin system, two extra pieces to carry per event, and 90 seconds per fin to attach. 45cm with 30–35° angle gives equivalent practical coverage for groups of 2–4 and folds flat in under 5 seconds.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>The operator side panel is worth the extra S$80–150.</strong> Mid-event laptop access is not hypothetical — you will need it. A full-height rear door is for emergencies; the operator panel is for routine adjustments. Both are needed.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>The A3 graphic insert slot is a legitimate revenue stream.</strong> Charge S$30–50 per event for a custom-printed insert with the client's monogram or logo. Your print cost is under S$5. Clients perceive enormous value from seeing their branding on the booth itself.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Ventilation perforations at the printer section are non-negotiable.</strong> The DNP DS-RX1HS generates significant heat during back-to-back printing. Without ventilation the printer throttles within 45 minutes inside a sealed metal box. Laser-perforated panels look premium and solve this entirely.</div></div>
+
+    <div class="stag" style="margin-top:16px;">Transport and events</div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>The fully loaded enclosure will weigh 50–65 kg.</strong> The empty metal shell travels separately from the equipment. Carry the shell into position at the venue, then load equipment inside. Never attempt to move the fully loaded tower up stairs or through narrow corridors.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Allow 90 minutes for setup.</strong> Fins (5 min) → backdrop (10 min) → tower positioning (5 min) → internal connections (15 min) → software boot + test print (15 min) → QR test (10 min) → props + final check (10 min) → 25 min buffer. Arriving 45 minutes before the event starts is too late.</div></div>
+    <div class="tip-row"><div class="dot da"></div><div><strong>Confirm loading bay and lift before every booking.</strong> The enclosure cannot go up stairs alone. Ask when confirming: is the function room ground floor? Is there a goods lift? Many hotel ballrooms and community club halls are not ground level.</div></div>
+    <div class="tip-row"><div class="dot dg"></div><div><strong>Post the enclosure on Instagram and TikTok immediately.</strong> A 30-second Reel of the enclosure being set up and guests using it generates higher-value enquiries faster than any other marketing you can do. The visual difference from a bare tripod setup is dramatic. This is how you justify charging S$180–220/hr.</div></div>
+  </div>
+</div>
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
