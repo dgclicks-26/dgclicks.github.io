@@ -3360,10 +3360,29 @@
     document.getElementById('ibModal').scrollTop = 0;
   }
 
+  function ibUpdatePriceHint() {
+    const pax      = parseInt(document.getElementById('ibPax').value) || 0;
+    const duration = parseFloat(document.getElementById('ibDuration').value) || 2.5;
+    const hint     = document.getElementById('ibDurationHint');
+    const paxHint  = document.getElementById('ibPaxHint');
+    if (!hint) return;
+
+    if (pax > 50) {
+      hint.innerHTML = `<span style="color:var(--pb-gold)">⚡ For ${pax} pax — pricing will be quoted after submission. We'll confirm within 2 hours.</span>`;
+      if (paxHint) paxHint.innerHTML = `<span style="color:var(--pb-gold)">Over 50 pax — we'll send you a custom quote.</span>`;
+    } else {
+      const base = duration * 120;
+      hint.innerHTML = `Estimated cost: <strong style="color:var(--pb-gold)">S$${base}</strong> (${duration} hrs × S$120). Night surcharge (+S$30/hr) applies after 10pm.`;
+      if (paxHint) paxHint.textContent = 'For events over 50 pax, pricing will be quoted after submission.';
+    }
+  }
+
   function ibCalcPrice() {
     const time     = document.getElementById('ibTime').value || '12:00';
     const duration = parseFloat(document.getElementById('ibDuration').value) || 2.5;
     const props    = document.getElementById('ibProps').value;
+    const pax      = parseInt(document.getElementById('ibPax').value) || 0;
+    const quoteOnly = pax > 50; // >50 pax — price to be quoted
 
     const startH   = parseInt(time.split(':')[0]);
     const startMin = parseInt(time.split(':')[1]);
@@ -3385,7 +3404,7 @@
     const propsAmt = props === 'yes' ? 30 : 0;
     const total    = baseAmt + nightAmt + propsAmt;
 
-    return { baseHrs: duration, baseAmt, nightHrs, nightAmt, propsAmt, total, duration };
+    return { baseHrs: duration, baseAmt, nightHrs, nightAmt, propsAmt, total, duration, quoteOnly };
   }
 
   function toggleTmplMode() {
@@ -3445,20 +3464,26 @@
       <div class="ib-summary-row"><span>Venue</span><span>${venue}</span></div>
       <div class="ib-summary-row"><span>Pax</span><span>${pax}</span></div>
       <div class="ib-summary-row"><span>Background</span><span>${bg}</span></div>
-      <div class="ib-summary-row"><span>Base rate</span><span>S$${p.baseAmt} (${p.baseHrs} hr${p.baseHrs > 1 ? 's' : ''} × S$120)</span></div>
+      <div class="ib-summary-row"><span>Base rate</span><span>${p.quoteOnly ? 'To be quoted' : 'S$' + p.baseAmt + ' (' + p.baseHrs + ' hr' + (p.baseHrs > 1 ? 's' : '') + ' × S$120)'}</span></div>
     `;
 
-    if (p.nightHrs > 0) {
-      rows += `<div class="ib-summary-row surcharge"><span>🌙 Night surcharge</span><span>S$${p.nightAmt} (${p.nightHrs} hr${p.nightHrs > 1 ? 's' : ''} after 10pm × S$30)</span></div>`;
+    if (!p.quoteOnly) {
+      if (p.nightHrs > 0) {
+        rows += `<div class="ib-summary-row surcharge"><span>🌙 Night surcharge</span><span>S$${p.nightAmt} (${p.nightHrs} hr${p.nightHrs > 1 ? 's' : ''} after 10pm × S$30)</span></div>`;
+      }
+      if (p.propsAmt > 0) {
+        rows += `<div class="ib-summary-row"><span>Props package</span><span>S$${p.propsAmt}</span></div>`;
+      }
+      rows += `<div class="ib-summary-row total"><span>Total</span><span>S$${p.total}</span></div>`;
+    } else {
+      if (p.propsAmt > 0) {
+        rows += `<div class="ib-summary-row"><span>Props package</span><span>S$${p.propsAmt}</span></div>`;
+      }
+      rows += `<div class="ib-summary-row total"><span>Total</span><span style="color:var(--pb-gold)">To be quoted — we'll confirm within 2 hours</span></div>`;
     }
-    if (p.propsAmt > 0) {
-      rows += `<div class="ib-summary-row"><span>Props package</span><span>S$${p.propsAmt}</span></div>`;
-    }
-
-    rows += `<div class="ib-summary-row total"><span>Total</span><span>S$${p.total}</span></div>`;
 
     document.getElementById('ibSummaryBox').innerHTML = rows;
-    document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
+    document.getElementById('ibPayAmount').textContent = p.quoteOnly ? 'To be confirmed' : `S$${p.total}`;
 
     // Show/hide props in included list
     document.getElementById('ibPropsIncluded').style.display = props === 'yes' ? '' : 'none';
@@ -3478,7 +3503,7 @@
     if (!time)         { alert('Please select a start time.'); return false; }
     if (!venue)        { alert('Please enter your venue.'); return false; }
     if (!pax || pax < 1)  { alert('Please enter expected pax.'); return false; }
-    if (pax > 50)      { alert('For events over 50 pax, please use the enquiry form below.'); return false; }
+    // Note: >50 pax is allowed — pricing will be quoted
 
     // Check date is in the future
     const today = new Date(); today.setHours(0,0,0,0);
@@ -3496,7 +3521,21 @@
       ibShowStep(3);                          // → Review & Price
     } else if (ibCurrentStep === 3) {
       const p = ibCalcPrice();
-      document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
+      if (p.quoteOnly) {
+        document.getElementById('ibPayAmount').textContent = 'To be confirmed';
+        document.getElementById('ibBtnNext').textContent = 'Submit Booking Request →';
+        // Show quote section, hide PayNow
+        document.getElementById('ibPayNowSection').style.display = 'none';
+        document.getElementById('ibQuoteSection').style.display = '';
+        document.getElementById('ibStep4Note').textContent = "Tap below to submit your booking request. We'll get back to you within 2 hours.";
+      } else {
+        document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
+        document.getElementById('ibBtnNext').textContent = "I've Paid — Confirm Booking →";
+        // Show PayNow, hide quote
+        document.getElementById('ibPayNowSection').style.display = '';
+        document.getElementById('ibQuoteSection').style.display = 'none';
+        document.getElementById('ibStep4Note').textContent = "After paying, tap the button below and we'll send you a confirmation email.";
+      }
       ibShowStep(4);                          // → PayNow
     } else if (ibCurrentStep === 4) {
       // Send booking to backend
@@ -3523,6 +3562,17 @@
           body: JSON.stringify(ibData),
         });
       } catch (e) { /* backend offline — still show success */ }
+      // Update success message based on quote vs payment
+      const finalP = ibCalcPrice();
+      if (finalP.quoteOnly) {
+        document.getElementById('ibSuccessIcon').textContent = '📋';
+        document.getElementById('ibSuccessTitle').textContent = 'Booking request sent!';
+        document.getElementById('ibSuccessMsg').innerHTML = "We'll review your booking and send you a custom quote within 2 hours. Reach us on Telegram <a href='https://t.me/dylan_dgclicks' style='color:var(--pb-gold)'>@dylan_dgclicks</a> if you need anything sooner.";
+      } else {
+        document.getElementById('ibSuccessIcon').textContent = '🎉';
+        document.getElementById('ibSuccessTitle').textContent = 'Payment sent!';
+        document.getElementById('ibSuccessMsg').innerHTML = "We'll confirm your booking via email within 2 hours. If you don't hear from us, reach out on Telegram <a href='https://t.me/dylan_dgclicks' style='color:var(--pb-gold)'>@dylan_dgclicks</a>.";
+      }
       ibShowStep(5);                          // → Success
     }
   }
@@ -3609,7 +3659,7 @@
         </div>
         <div class="ib-field">
           <label>Duration</label>
-          <select id="ibDuration">
+          <select id="ibDuration" onchange="ibUpdatePriceHint()">
             <option value="2.5" selected>2.5 hours</option>
             <option value="3">3 hours</option>
             <option value="3.5">3.5 hours</option>
@@ -3619,7 +3669,7 @@
             <option value="5.5">5.5 hours</option>
             <option value="6">6 hours</option>
           </select>
-          <div class="ib-hint">Minimum 2.5 hours. Night surcharge (+S$30) applies for every hour or part thereof after 10pm.</div>
+          <div class="ib-hint" id="ibDurationHint">Minimum 2.5 hours. Night surcharge (+S$30) applies for every hour or part thereof after 10pm.</div>
         </div>
         <div class="ib-field">
           <label>Event venue / address</label>
@@ -3628,8 +3678,8 @@
         <div class="ib-row">
           <div class="ib-field">
             <label>Expected pax</label>
-            <input type="number" id="ibPax" placeholder="e.g. 30" min="1" max="50" />
-            <div class="ib-hint">Maximum 50 pax for instant booking.</div>
+            <input type="number" id="ibPax" placeholder="e.g. 30" min="1" onchange="ibUpdatePriceHint()" oninput="ibUpdatePriceHint()" />
+            <div class="ib-hint" id="ibPaxHint">For events over 50 pax, pricing will be quoted after submission.</div>
           </div>
           <div class="ib-field">
             <label>Background colour</label>
@@ -3756,13 +3806,13 @@
         </p>
       </div>
 
-      <!-- STEP 4: PayNow -->
+      <!-- STEP 4: PayNow / Quote -->
       <div class="ib-step" id="ibStep4">
-        <div class="ib-paynow">
+        <!-- Normal payment (<=50 pax) -->
+        <div class="ib-paynow" id="ibPayNowSection">
           <div class="ib-paynow-label">Pay via PayNow to confirm your slot</div>
           <div class="ib-paynow-num">+65 8518 7046</div>
           <div class="ib-paynow-amount">Amount to pay: <strong id="ibPayAmount">S$0</strong></div>
-          <!-- PayNow QR code — upload your QR image to /images/paynow-qr.png in your GitHub repo -->
           <div class="ib-qr" id="ibQrCode">
             <img src="/dgclicks.github.io/images/paynow-qr.png"
               alt="PayNow QR" style="width:100%;height:100%;object-fit:contain"
@@ -3777,7 +3827,20 @@
             We will confirm your booking via email within 2 hours of receiving payment.
           </div>
         </div>
-        <p style="font-size:0.72rem;font-weight:300;color:var(--pb-muted);line-height:1.65">
+        <!-- Quote only (>50 pax) -->
+        <div id="ibQuoteSection" style="display:none;text-align:center;padding:1.5rem 0;">
+          <div style="font-size:2rem;margin-bottom:0.8rem">📋</div>
+          <div style="font-size:1rem;font-weight:500;color:var(--pb-gold);margin-bottom:0.5rem;">Pricing will be quoted</div>
+          <p style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;max-width:340px;margin:0 auto 1rem;">
+            Your event has more than 50 pax. We'll review your booking and send you a custom quote via email within 2 hours.
+            No payment is required now.
+          </p>
+          <div style="font-size:0.75rem;color:var(--pb-muted);border:1px solid var(--pb-border);padding:0.8rem;background:rgba(200,146,42,0.05);">
+            📧 Confirmation and quote sent to your email<br/>
+            💬 Or reach us on Telegram <a href="https://t.me/dylan_dgclicks" style="color:var(--pb-gold)">@dylan_dgclicks</a>
+          </div>
+        </div>
+        <p style="font-size:0.72rem;font-weight:300;color:var(--pb-muted);line-height:1.65;margin-top:1rem" id="ibStep4Note">
           After paying, tap the button below and we'll send you a confirmation email.
         </p>
       </div>
@@ -3785,9 +3848,9 @@
       <!-- SUCCESS -->
       <div class="ib-step" id="ibStepSuccess">
         <div class="ib-success">
-          <div class="ib-success-icon">🎉</div>
-          <h3>Payment sent!</h3>
-          <p>We'll confirm your booking via email within 2 hours. If you don't hear from us, reach out on Telegram <a href="https://t.me/dylan_dgclicks" style="color:var(--pb-gold)">@dylan_dgclicks</a>.</p>
+          <div class="ib-success-icon" id="ibSuccessIcon">🎉</div>
+          <h3 id="ibSuccessTitle">Payment sent!</h3>
+          <p id="ibSuccessMsg">We'll confirm your booking via email within 2 hours. If you don't hear from us, reach out on Telegram <a href="https://t.me/dylan_dgclicks" style="color:var(--pb-gold)">@dylan_dgclicks</a>.</p>
         </div>
       </div>
 
