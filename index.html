@@ -1963,7 +1963,7 @@
         <div class="pb-feat-card">
           <div class="pb-feat-num">03</div>
           <div class="pb-feat-title">4 background colours</div>
-          <div class="pb-feat-desc">Four primary colours are <span class="pb-feat-accent">included in the base price</span>. Special and themed backgrounds available for extra fee.</div>
+          <div class="pb-feat-desc">Five primary colours are <span class="pb-feat-accent">included in the base price</span>: White, Black, Red, Blue and Grey. Special and themed backgrounds available for extra fee.</div>
         </div>
         <div class="pb-feat-card">
           <div class="pb-feat-num">04</div>
@@ -3088,6 +3088,7 @@
     const names = {
       white:'White — included', black:'Black — included',
       red:'Red — included', blue:'Blue — included',
+      grey:'Grey — included',
       rainbow:'Rainbow Gradient — extra fee applies',
       galaxy:'Galaxy / Night Sky — extra fee applies',
       pastel:'Pastel Dream — extra fee applies',
@@ -3095,7 +3096,7 @@
       seasonal:'Seasonal / Custom — extra fee applies',
     };
     document.getElementById('swatchLabel').textContent = names[value] || '';
-    document.getElementById('swatchLabel').style.color = colour === 'special' ? 'var(--pb-gold)' : colour === '#FFFFFF' || colour === '#FCD34D' ? 'var(--pb-muted)' : colour;
+    document.getElementById('swatchLabel').style.color = colour === 'special' ? 'var(--pb-gold)' : (colour === '#FFFFFF' || colour === '#FCD34D' || colour === '#9CA3AF') ? 'var(--pb-muted)' : colour;
     const sel = document.getElementById('pbBackground');
     if (sel) sel.value = value;
   }
@@ -3106,6 +3107,7 @@
     black:   { name:'Black Background',    style:'background:#111111', emoji:'🖤', note:'Dramatic and sophisticated. Perfect for prom nights, dinner events, and any gathering with a glamorous feel.', searches:[{label:'Photobooth black background examples',q:'photobooth black background glamour party'},{label:'Black backdrop event photos',q:'black backdrop photo booth prom night'}] },
     red:     { name:'Red Background',      style:'background:#FF4444', emoji:'❤️', note:'Bold and vibrant. Ideal for Chinese New Year, Valentine\'s Day, or any high-energy celebration.', searches:[{label:'Photobooth red background examples',q:'photobooth red background chinese new year party'},{label:'Red backdrop event photos',q:'red backdrop photo booth valentine celebration'}] },
     blue:    { name:'Blue Background',     style:'background:#3B82F6', emoji:'💙', note:'Cool and professional. Great for corporate events, graduation parties, and sports-themed celebrations.', searches:[{label:'Photobooth blue background examples',q:'photobooth blue background corporate event graduation'},{label:'Blue backdrop event photos',q:'blue backdrop photo booth party photos'}] },
+    grey:    { name:'Grey Background',     style:'background:#9CA3AF', emoji:'🩶', note:'Neutral and versatile. Grey works beautifully for corporate events, minimalist aesthetics, and any occasion where you want a clean, modern feel.', searches:[{label:'Photobooth grey background examples',q:'photobooth grey background modern event'},{label:'Grey backdrop event photos',q:'grey backdrop photo booth corporate event'}] },
     green:   { name:'Green Background',    style:'background:#22C55E', emoji:'💚', note:'Fresh and lively. Perfect for nature-themed events, garden parties, and outdoor celebrations.', searches:[{label:'Photobooth green background examples',q:'photobooth green background garden party event'},{label:'Green backdrop event photos',q:'green backdrop photo booth celebration'}] },
     yellow:  { name:'Yellow Background',   style:'background:#FCD34D', emoji:'💛', note:'Cheerful and sunny. Suits children\'s parties, tropical themes, and upbeat celebrations.', searches:[{label:'Photobooth yellow background examples',q:'photobooth yellow background birthday kids party'},{label:'Yellow backdrop event photos',q:'yellow backdrop photo booth fun celebration'}] },
     orange:  { name:'Orange Background',   style:'background:#F97316', emoji:'🧡', note:'Warm and energetic. Works well for Halloween, autumn themes, and high-energy events.', searches:[{label:'Photobooth orange background examples',q:'photobooth orange background halloween autumn party'},{label:'Orange backdrop event photos',q:'orange backdrop photo booth event photos'}] },
