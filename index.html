@@ -1710,8 +1710,9 @@
   <div class="nav-logo">DG<span>Clicks</span></div>
   <div class="nav-tabs">
     <!-- DIGICAM TAB — remove display:none to show -->
-    <button class="nav-tab active" onclick="switchTab('digicam')" style="display:none">📷 Digicams</button>
-    <button class="nav-tab"        onclick="switchTab('photobooth')">🎞 Photobooth</button>
+    <!-- DIGICAM TAB — remove display:none to show -->
+    <button class="nav-tab" onclick="switchTab('digicam')" style="display:none">📷 Digicams</button>
+    <button class="nav-tab active" onclick="switchTab('photobooth')">🎞 Photobooth</button>
   </div>
   <div class="nav-links">
     <a href="#" onclick="scrollToSection('shop','digicam')">Shop</a>
@@ -2499,7 +2500,9 @@
   /* ------ TAB SWITCHING ------ */
   window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('tab') === 'photobooth') switchTab('photobooth');
+    // Default to photobooth since digicam tab is hidden
+    const tab = params.get('tab') === 'digicam' ? 'digicam' : 'photobooth';
+    switchTab(tab);
   });
 
   function switchTab(tab) {
