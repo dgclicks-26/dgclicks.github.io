@@ -1709,7 +1709,8 @@
 <nav>
   <div class="nav-logo">DG<span>Clicks</span></div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('digicam')">📷 Digicams</button>
+    <!-- DIGICAM TAB — remove display:none to show -->
+    <button class="nav-tab active" onclick="switchTab('digicam')" style="display:none">📷 Digicams</button>
     <button class="nav-tab"        onclick="switchTab('photobooth')">🎞 Photobooth</button>
   </div>
   <div class="nav-links">
@@ -1926,7 +1927,8 @@
             </div>
           </div>
         </div>
-        <div class="pb-what-visual">
+        <!-- SETUP PHOTO — remove display:none to show when you have a photo -->
+        <div class="pb-what-visual" style="display:none">
           <div class="pb-what-placeholder">
             <div class="icon">📷</div>
             <p>Add your photobooth setup photo here<br/><span style="font-size:0.65rem;opacity:0.5">(Upload to /images/photobooth-setup.jpg)</span></p>
@@ -2109,7 +2111,8 @@
   </section>
 
   <!-- 6. PAST EVENTS GALLERY -->
-  <section class="pb-gallery">
+  <!-- PAST EVENTS SECTION — remove the display:none to show when ready -->
+  <section class="pb-gallery" style="display:none">
     <div class="pb-gallery-inner">
       <div class="pb-section-label">Past events</div>
       <h2 class="pb-section-title">See it in action.</h2>
@@ -2176,6 +2179,10 @@
           <div class="bg-swatch" style="background:#3B82F6">💙</div>
           <div class="bg-info"><div class="bg-name">Blue</div><div class="bg-price">Included</div></div>
         </div>
+        <div class="bg-card" onclick="openBgPreview('grey')" style="cursor:pointer">
+          <div class="bg-swatch" style="background:#9CA3AF">🩶</div>
+          <div class="bg-info"><div class="bg-name">Grey</div><div class="bg-price">Included</div></div>
+        </div>
       </div>
 
       <div class="surcharge-box" style="border-color:rgba(200,146,42,0.2);background:rgba(200,146,42,0.04)">
@@ -2231,6 +2238,7 @@
             <option value="black">Black (included)</option>
             <option value="red">Red (included)</option>
             <option value="blue">Blue (included)</option>
+            <option value="grey">Grey (included)</option>
             <option value="special">Special / Custom background (+extra fee)</option>
           </select>
         </div>
@@ -2696,7 +2704,7 @@
   function askFromDetail() {
     if (!activeCamDetail) return;
     closeCamDetail();
-    switchTab('digicam');
+    switchTab('photobooth');
     setTimeout(() => {
       document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
       const sel = document.getElementById('dqCamera');
@@ -3095,6 +3103,7 @@
     yellow:  { name:'Yellow Background',   style:'background:#FCD34D', emoji:'💛', note:'Cheerful and sunny. Suits children\'s parties, tropical themes, and upbeat celebrations.', searches:[{label:'Photobooth yellow background examples',q:'photobooth yellow background birthday kids party'},{label:'Yellow backdrop event photos',q:'yellow backdrop photo booth fun celebration'}] },
     orange:  { name:'Orange Background',   style:'background:#F97316', emoji:'🧡', note:'Warm and energetic. Works well for Halloween, autumn themes, and high-energy events.', searches:[{label:'Photobooth orange background examples',q:'photobooth orange background halloween autumn party'},{label:'Orange backdrop event photos',q:'orange backdrop photo booth event photos'}] },
     purple:  { name:'Purple Background',   style:'background:#A855F7', emoji:'💜', note:'Luxurious and creative. Suits masquerade balls, art events, and elegant birthday parties.', searches:[{label:'Photobooth purple background examples',q:'photobooth purple background elegant birthday masquerade'},{label:'Purple backdrop event photos',q:'purple backdrop photo booth party luxury'}] },
+    grey:    { name:'Grey Background',    style:'background:#9CA3AF', emoji:'🩶', note:'Neutral and versatile. Grey works beautifully for corporate events, minimalist aesthetics, and any occasion where you want a clean, modern feel.', searches:[{label:'Photobooth grey background examples',q:'photobooth grey background modern event'},{label:'Grey backdrop event photos',q:'grey backdrop photo booth corporate event'}] },
     pink:    { name:'Pink Background',     style:'background:#EC4899', emoji:'🩷', note:'Fun and playful. A crowd favourite for hen parties, birthday celebrations, and girly gatherings.', searches:[{label:'Photobooth pink background examples',q:'photobooth pink background hen party birthday girls'},{label:'Pink backdrop event photos',q:'pink backdrop photo booth bachelorette celebration'}] },
     rainbow: { name:'Rainbow Gradient',    style:'background:linear-gradient(135deg,#FF6B6B,#4ECDC4,#FCD34D)', emoji:'✨', note:'A showstopper — colourful, vibrant, and amazing on social media. Extra fee applies.', searches:[{label:'Photobooth gradient background examples',q:'photobooth gradient rainbow background colourful party'},{label:'Colourful backdrop event photos',q:'colourful gradient backdrop photo booth instagram'}] },
     galaxy:  { name:'Galaxy / Night Sky',  style:'background:radial-gradient(circle,#1a1a2e,#16213e,#0f3460)', emoji:'🌌', note:'Mysterious and dramatic — creates stunning contrast. Extra fee applies.', searches:[{label:'Photobooth galaxy background examples',q:'photobooth galaxy night sky background party event'},{label:'Dark backdrop event photos',q:'galaxy backdrop photo booth dark aesthetic'}] },
@@ -3620,6 +3629,7 @@
               <option value="Black">Black</option>
               <option value="Red">Red</option>
               <option value="Blue">Blue</option>
+              <option value="Grey">Grey</option>
             </select>
           </div>
         </div>
