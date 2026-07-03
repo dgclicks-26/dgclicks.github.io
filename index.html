@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DGClicks — Cameras & Photobooth Singapore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://dgclicks.github.io" />
+  <link rel="preconnect" href="https://digicam-venture.onrender.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Dancing+Script:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
 
@@ -2554,7 +2558,7 @@
       <h1 class="gx-title">Some moments deserve<br/>to last <em>forever.</em></h1>
       <p class="gx-sub">Curated secondhand digital cameras, personally tested and fairly priced. For those who still believe in a real photograph.</p>
       <div class="gx-btns">
-        <button class="btn-primary magnetic" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Browse Cameras</button>
+        <button class="btn-primary magnetic" onclick="jumpTo('shop')">Browse Cameras</button>
         <a href="https://t.me/dgclicks_26" target="_blank" class="btn-secondary magnetic">Join Our Channel</a>
       </div>
       <div class="hero-stats" style="margin-top:2.4rem">
@@ -2695,8 +2699,8 @@
       <h1 class="gx-title">Every party deserves<br/>a <em>print</em> to remember.</h1>
       <p class="gx-sub">Professional photobooth delivered to your venue. Unlimited prints, colourful backgrounds, and real photos people can hold.</p>
       <div class="gx-btns">
-        <button class="btn-pb-primary magnetic" onclick="document.getElementById('pb-calendar').scrollIntoView({behavior:'smooth'})">Check Availability</button>
-        <button class="btn-pb-secondary magnetic" onclick="document.getElementById('pb-pricing').scrollIntoView({behavior:'smooth'})">See Pricing</button>
+        <button class="btn-pb-primary magnetic" onclick="jumpTo('pb-calendar')">Check Availability</button>
+        <button class="btn-pb-secondary magnetic" onclick="jumpTo('pb-pricing')">See Pricing</button>
       </div>
 
     <!-- Colour swatches -->
@@ -3116,7 +3120,7 @@
               <li>Custom branding on prints</li>
               <li class="extra">Tailored quote provided</li>
             </ul>
-            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="document.getElementById('pb-enquiry').scrollIntoView({behavior:'smooth'})">Send Enquiry →</button>
+            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="jumpTo('pb-enquiry')">Send Enquiry →</button>
           </div>
         </div>
 
@@ -3192,31 +3196,31 @@
         <!-- Replace these with real event photos -->
         <!-- Upload to /images/event-1.jpg etc on your GitHub repo -->
         <div class="gallery-item tall">
-          <img src="https://dgclicks.github.io/images/event-1.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-1.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 1</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Birthday · Pink background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-2.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-2.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 2</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Corporate · White background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-3.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-3.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 3</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">21st Birthday · Black background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-4.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-4.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 4</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Prom Night · Blue background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-5.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-5.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 5</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Wedding · Special background</div></div>
@@ -3577,28 +3581,55 @@
 
   /* ------ TAB SWITCHING ------ */
   window.addEventListener('load', () => {
+    if (document.body.__tabInit) return;   // already initialised on DOMContentLoaded
     const params = new URLSearchParams(window.location.search);
-    // Default to photobooth since digicam tab is hidden
     const tab = params.get('tab') === 'digicam' ? 'digicam' : 'photobooth';
-    switchTab(tab);
+    switchTab(tab, true);                   // init only — never yank the user's scroll to top
+    document.body.__tabInit = true;
+  });
+  // Also run on DOMContentLoaded so the page initialises even if `load` never
+  // fires (a hanging CDN image / font would otherwise leave it half-set-up).
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.body.__tabInit) return;
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') === 'digicam' ? 'digicam' : 'photobooth';
+    switchTab(tab, true);
+    document.body.__tabInit = true;
   });
 
-  function switchTab(tab) {
+  function switchTab(tab, skipScroll) {
     const tabs   = document.querySelectorAll('.nav-tab');
     const ticker = document.getElementById('tickerInner');
     tabs[0].classList.toggle('active', tab === 'digicam');
     tabs[1].classList.toggle('active', tab === 'photobooth');
     document.body.classList.toggle('pb-mode', tab === 'photobooth');
     ticker.innerHTML = tab === 'photobooth' ? TICKER_PHOTOBOOTH : TICKER_DIGICAM;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!skipScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Robust in-page scroll: lands the target just below the sticky nav, and
+  // (unlike scrollIntoView) is never clobbered by a competing scroll.
+  function jumpTo(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const navH = (document.querySelector('nav')?.offsetHeight || 0) + 12;
+    const y = el.getBoundingClientRect().top + window.scrollY - navH;
+    const start = window.scrollY;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    // Fallback for contexts where window.scrollTo is a no-op: land below the
+    // sticky nav via scroll-margin-top so the section header isn't hidden.
+    setTimeout(() => {
+      if (Math.abs(window.scrollY - start) < 2 && Math.abs(y - start) > 4) {
+        el.style.scrollMarginTop = navH + 'px';
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 400);
+  }
+  window.jumpTo = jumpTo;
 
   function scrollToSection(sectionId, tab) {
     switchTab(tab);
-    setTimeout(() => {
-      const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+    setTimeout(() => jumpTo(sectionId), 300);
   }
 
   /* ------ SCROLL REVEAL OBSERVER ------ */
@@ -3722,7 +3753,7 @@
     const angles = ['Main', 'Top', 'Side', 'Lens'];
     document.getElementById('camImgThumbs').innerHTML = angles.map((lbl, i) => `
       <div class="cam-img-thumb ${i===0?'active':''}" onclick="switchCamImg('${cam.id}', ${i}, this)">
-        <img src="https://dgclicks.github.io/images/${cam.id}-${i}.jpg" alt="${lbl}"
+        <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/${cam.id}-${i}.jpg" alt="${lbl}"
           onerror="this.parentElement.innerHTML='<span style=font-size:1rem>${['📷','⬆','◀','🔍'][i]}</span>'" />
       </div>
     `).join('');
@@ -3947,7 +3978,7 @@
         role="button" tabindex="0"
         aria-label="${c.brand} ${c.model}">
         <div class="card-img">
-          <img src="https://dgclicks.github.io/images/${c.id}.jpg" alt="${c.brand} ${c.model}"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/${c.id}.jpg" alt="${c.brand} ${c.model}"
             onerror="this.classList.add('hidden');this.nextElementSibling.style.display='block'" />
           <span class="fallback-emoji" style="display:none">${c.emoji}</span>
           <span class="badge ${badgeClass(c.condition)}">${c.condition}</span>
@@ -4900,7 +4931,7 @@
           <div class="ib-paynow-num">+65 8518 7046</div>
           <div class="ib-paynow-amount">Amount to pay: <strong id="ibPayAmount">S$0</strong></div>
           <div class="ib-qr" id="ibQrCode">
-            <img src="/images/paynow-qr.png"
+            <img src="https://dgclicks.github.io/images/paynow-qr.png"
               alt="PayNow QR" style="width:100%;height:100%;object-fit:contain"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
             <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.65rem;color:#555;text-align:center;gap:4px">
@@ -4954,13 +4985,24 @@
 // ============================================================
 // 3D CAMERA VIEWER — Three.js r160
 // ============================================================
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+// Three.js is heavy (~600KB) and was previously downloaded on EVERY page load,
+// even though the 3D viewer is only used when a visitor opens a camera's 3D tab.
+// Load it lazily instead so it never blocks initial page load.
+let THREE = null, GLTFLoader = null;
+async function ensureThree() {
+  if (THREE) return;
+  const [t, g] = await Promise.all([
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js')
+  ]);
+  THREE = t;
+  GLTFLoader = g.GLTFLoader;
+}
 
 // Map camera IDs to their GLB model URLs and spec chips
 const CAMERA_MODELS = {
   'CAM-001': {
-    url: '/models/canon_g7x__camera_model.glb',
+    url: 'https://dgclicks-26.github.io/dgclicks.github.io/models/canon_g7x__camera_model.glb',
     chips: ['f/1.8 Lens', '20.1MP', '4K Video', 'Tilt LCD']
   }
 };
@@ -5017,11 +5059,13 @@ function dispose3D() {
   scene = null; camera3d = null; modelGroup = null;
 }
 
-function init3DViewer(glbUrl, chips) {
+async function init3DViewer(glbUrl, chips) {
   dispose3D();
   const wrap = document.getElementById('cam3dWrap');
   if (!wrap) return;
   currentWrap = wrap;
+  await ensureThree();          // pull in Three.js on demand (spinner already showing)
+  if (currentWrap !== wrap) return;  // user closed/switched while loading
 
   // Show chips
   const chipsEl = document.getElementById('cam3dChips');
@@ -6051,6 +6095,30 @@ if (_origOpen) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine   = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  /* ---------- SCROLL-LOCK WATCHDOG (bulletproof) ----------
+     Several overlays set body.overflow='hidden' while open. If one ever fails
+     to reset (interrupted close, error mid-handler), the page becomes
+     un-scrollable with no visible overlay. This guard clears any stray lock
+     whenever the user tries to scroll and NOTHING is actually open. */
+  const LOCKERS = ['#buyModal.open','.modal-overlay.open','#camDetailOverlay.open','.cam-detail-overlay.open',
+    '.img-zoom-overlay.open','.ib-overlay.open','.bg-preview-overlay.open','.vpb-result.open',
+    '#vpbCameraModal.open','.vpb-camera-modal.open','#dsOverlay.open','.ds-overlay.open'];
+  const somethingOpen = () => LOCKERS.some(s => {
+    const e = document.querySelector(s);
+    return e && (e.offsetParent !== null || getComputedStyle(e).display !== 'none');
+  });
+  const unlockIfStray = () => {
+    if (somethingOpen()) return;
+    const b = document.body.style, h = document.documentElement.style;
+    if (b.overflow === 'hidden' || b.overflowY === 'hidden') { b.overflow = ''; b.overflowY = ''; b.overflowX = 'clip'; }
+    if (h.overflow === 'hidden' || h.overflowY === 'hidden') { h.overflow = ''; h.overflowY = ''; }
+    if (b.position === 'fixed') { b.position = ''; }
+  };
+  ['wheel','touchstart','keydown','pointerdown'].forEach(ev =>
+    addEventListener(ev, unlockIfStray, { passive: true }));
+  setInterval(unlockIfStray, 1500);   // catch-all
+  unlockIfStray();
+
   /* ---------- Scrolling: NATIVE (bulletproof) ----------
      A wheel-hijacking smooth-scroll library used to run here, but it could
      trap scrolling on some machines / downloaded copies. Removed for good.
@@ -6183,7 +6251,7 @@ if (_origOpen) {
     if (filmDot)  filmDot.style.top = (prog*100).toFixed(2) + '%';
     if (filmPct)  filmPct.textContent = Math.round(prog*100) + '%';
     document.body.classList.toggle('scrolled', sy > 40);
-    if (!reduce) blobs.forEach((b,i) => { b.style.transform = `translateY(${(sy * (0.04 + i*0.03)).toFixed(1)}px)`; });
+    /* blob scroll-parallax removed — transforming 70px-blurred layers every frame caused scroll jank */
   }
   let ticking = false;
   const onScroll = () => { if (!ticking){ ticking = true; requestAnimationFrame(() => { applyScroll(); ticking = false; }); } };
@@ -6199,7 +6267,7 @@ if (_origOpen) {
     let current = document.body.classList.contains('pb-mode') ? 'photobooth' : 'digicam';
     let first = true;
     window.switchTab = function(tab){
-      if (first || reduce || tab === current){ first = false; current = tab; return _switch(tab); }
+      if (first || reduce || tab === current){ first = false; current = tab; return _switch.apply(null, arguments); }
       wipe.classList.remove('opening');
       wipe.classList.add('closing');
       setTimeout(() => {
@@ -6226,7 +6294,7 @@ if (_origOpen) {
       setTimeout(() => { if (sh.parentNode) sh.remove(); }, 1300);
     };
     if (reduce) { sh.remove(); return; }
-    setTimeout(open, 1100);
+    setTimeout(open, 350);
     setTimeout(open, 3000);                              // failsafe
     // Guarantee the camera ends visible even if the intro froze (backgrounded tab)
     const camReady = () => document.body.classList.add('cam-ready');
