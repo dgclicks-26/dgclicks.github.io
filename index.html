@@ -1614,6 +1614,7 @@
     .ib-field input:focus, .ib-field select:focus, .ib-field textarea:focus { border-color: var(--pb-gold); }
     .ib-field textarea { min-height: 80px; resize: vertical; }
     .ib-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .ib-row-venue { grid-template-columns: 2fr 1fr; }
     .ib-field .ib-hint { font-size: 0.68rem; color: var(--pb-muted); margin-top: 3px; }
     .ib-venue-suggest {
       position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
@@ -1700,7 +1701,7 @@
     @media(max-width:768px){
       .pricing-tier-wrap { grid-template-columns: 1fr; }
       .pricing-tier-divider { width: 100%; height: 40px; writing-mode: horizontal-tb; border-left: none; border-right: none; border-top: 1px solid var(--pb-border); border-bottom: 1px solid var(--pb-border); }
-      .ib-row { grid-template-columns: 1fr; }
+      .ib-row, .ib-row-venue { grid-template-columns: 1fr; }
     }
   
     /* ━━━━━━━━━━━━━━━━━━━━ VIRTUAL PHOTOBOOTH ━━━━━━━━━━━━━━━━━━━━ */
@@ -4454,7 +4455,7 @@
     const hint = document.getElementById('ibBgHint');
     if (hint) hint.innerHTML = (bg === 'Custom')
       ? "<span style='color:var(--pb-gold)'>A custom-made background carries an additional cost, so this option is quoted by enquiry — you won't be asked to pay directly. We'll email you a tailored quote.</span>"
-      : "<span style='color:var(--pb-gold)'>Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span>";
+      : "<span style='color:var(--pb-gold)'>Green screen gives a clean solid-colour background at no cost. ⚠️ Please avoid wearing green or colours close to green, and write the colour you'd like in the 'Anything else?' box below. Prefer a designed / custom background? Choose 'Custom' and we'll quote it by enquiry.</span>";
     if (typeof ibUpdatePriceHint === 'function') ibUpdatePriceHint();
   }
 
@@ -4816,32 +4817,27 @@
           </select>
           <div class="ib-hint" id="ibDurationHint">Minimum 2.5 hours. Night surcharge (+S$30) applies for every hour or part thereof after 10pm.</div>
         </div>
-        <div class="ib-field">
-          <label>Event venue / address</label>
-          <div style="position:relative">
-            <input type="text" id="ibVenue" placeholder="e.g. Suntec City Convention Centre, Level 3" autocomplete="off" oninput="ibVenueSearch()" onblur="ibVenueBlur()" />
-            <div id="ibVenueSuggest" class="ib-venue-suggest" style="display:none"></div>
+        <div class="ib-row ib-row-venue">
+          <div class="ib-field">
+            <label>Event venue / address</label>
+            <div style="position:relative">
+              <input type="text" id="ibVenue" placeholder="e.g. Suntec City Convention Centre, Level 3" autocomplete="off" oninput="ibVenueSearch()" onblur="ibVenueBlur()" />
+              <div id="ibVenueSuggest" class="ib-venue-suggest" style="display:none"></div>
+            </div>
           </div>
-        </div>
-        <div class="ib-row">
           <div class="ib-field">
             <label>Expected pax</label>
             <input type="number" id="ibPax" placeholder="e.g. 30" min="1" onchange="ibUpdatePriceHint()" oninput="ibUpdatePriceHint()" />
-            <div class="ib-hint" id="ibPaxHint">For events over 50 pax, pricing will be quoted after submission.</div>
+            <div class="ib-hint" id="ibPaxHint">Over 50 pax — pricing quoted after submission.</div>
           </div>
-          <div class="ib-field">
-            <label>Background colour</label>
-            <select id="ibBackground" onchange="ibBgChange()">
-              <option value="Green Screen">Green screen — digital background (included)</option>
-              <option value="White">White backdrop (included)</option>
-              <option value="Black">Black backdrop (included)</option>
-              <option value="Red">Red backdrop (included)</option>
-              <option value="Blue">Blue backdrop (included)</option>
-              <option value="Grey">Grey backdrop (included)</option>
-              <option value="Custom">Custom-made background (+ additional cost)</option>
-            </select>
-            <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span></div>
-          </div>
+        </div>
+        <div class="ib-field">
+          <label>Background</label>
+          <select id="ibBackground" onchange="ibBgChange()">
+            <option value="Green Screen">Green screen — solid colour (included)</option>
+            <option value="Custom">Custom-made background (+ additional cost)</option>
+          </select>
+          <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">Green screen gives a clean solid-colour background at no cost. ⚠️ Please avoid wearing green or colours close to green, and write the colour you'd like in the 'Anything else?' box below. Prefer a designed / custom background? Choose 'Custom' and we'll quote it by enquiry.</span></div>
         </div>
         <div class="ib-field">
           <label>Props package</label>
