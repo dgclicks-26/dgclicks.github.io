@@ -6103,11 +6103,13 @@ if (_origOpen) {
 
 <script>
 (function(){
-  // Low-power / mobile devices take the same lightweight path as "reduce motion":
-  // skips the scroll-spin, reveals, parallax and count-ups that peg the main thread
-  // on load (the freeze). Applies to phones, small screens and low-core machines.
+  // SPEED MODE — serves the lightweight, static version that doesn't freeze on load.
+  // LITE_ALL = true  -> fast on EVERY device (desktop included).
+  // LITE_ALL = false -> full animations on desktop, lite only on phones/small screens.
+  const LITE_ALL = true;
   const _prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const _lowPower = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  const _lowPower = LITE_ALL
+                    || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
                     || ((navigator.hardwareConcurrency || 8) <= 4)
                     || window.matchMedia('(max-width: 820px)').matches;
   if (_lowPower) document.documentElement.classList.add('lite');
