@@ -2462,6 +2462,18 @@
 
     @media (prefers-reduced-motion: reduce) { .ds-overlay.open { animation: none; } }
 
+    /* Lite mode: weak/mobile devices. Settle animations instantly (end-states kept,
+       so nothing disappears) to kill the continuous main-thread work that freezes
+       phones on load. Scoped to html.lite so full-power desktop is untouched. */
+    html.lite *, html.lite *::before, html.lite *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+
 </style>
   <script type="importmap">
   {
@@ -6091,7 +6103,15 @@ if (_origOpen) {
 
 <script>
 (function(){
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Low-power / mobile devices take the same lightweight path as "reduce motion":
+  // skips the scroll-spin, reveals, parallax and count-ups that peg the main thread
+  // on load (the freeze). Applies to phones, small screens and low-core machines.
+  const _prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const _lowPower = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+                    || ((navigator.hardwareConcurrency || 8) <= 4)
+                    || window.matchMedia('(max-width: 820px)').matches;
+  if (_lowPower) document.documentElement.classList.add('lite');
+  const reduce = _prefersReduce || _lowPower;
   const fine   = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ---------- SCROLL-LOCK WATCHDOG (bulletproof) ----------
