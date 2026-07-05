@@ -3073,6 +3073,49 @@
     </div>
   </div>
 
+  <section class="pb-calendar-section" id="pb-calendar">
+    <div class="cal-wrap">
+      <div class="pb-section-label">Availability</div>
+      <h2 class="pb-section-title">Check available dates</h2>
+      <p class="pb-section-desc">
+        Click a date to see available time slots. Green is free, red is taken, yellow is buffer time.
+        Click a slot to pre-fill the booking form below.
+      </p>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calChangeMonth(-1)">‹</button>
+        <div class="cal-month-label" id="calMonthLabel"></div>
+        <button class="cal-nav-btn" onclick="calChangeMonth(1)">›</button>
+      </div>
+      <div class="cal-dow-row">
+        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+        <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
+        <div class="cal-dow">Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#27AE60"></div>Available</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-gold)"></div>Partially booked</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-red)"></div>Fully booked</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-border)"></div>Past / unavailable</div>
+      </div>
+      <div class="cal-slots-wrap" id="calSlotsWrap">
+        <div class="cal-slots-title" id="calSlotsTitle"></div>
+        <div class="cal-slots-subtitle" id="calSlotsSubtitle"></div>
+        <div class="slots-legend">
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(39,174,96,0.15)"></div>Available</div>
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(192,57,43,0.12)"></div>Booked</div>
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(200,146,42,0.12)"></div>Buffer time</div>
+        </div>
+        <div class="cal-slots-grid" id="calSlotsGrid"></div>
+        <div class="cal-selected-info" id="calSelectedInfo">
+          <h4>Time slot selected</h4>
+          <p id="calSelectedText"></p>
+          <button class="btn-go-book" onclick="scrollToBookingForm()">Fill in booking form →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="pb-section" id="pb-pricing" style="background:var(--pb-card);border-top:1px solid var(--pb-border)">
     <div style="max-width:1100px;margin:0 auto">
       <div class="pb-section-label">Pricing</div>
@@ -3131,7 +3174,7 @@
               <li>Custom branding on prints</li>
               <li class="extra">Tailored quote provided</li>
             </ul>
-            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="jumpTo('pb-enquiry')">Send Enquiry →</button>
+            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="openInstantBook()">Send Enquiry →</button>
           </div>
         </div>
 
@@ -3153,48 +3196,7 @@
   </section>
 
   <!-- 5. AVAILABILITY CALENDAR -->
-  <section class="pb-calendar-section" id="pb-calendar">
-    <div class="cal-wrap">
-      <div class="pb-section-label">Availability</div>
-      <h2 class="pb-section-title">Check available dates</h2>
-      <p class="pb-section-desc">
-        Click a date to see available time slots. Green is free, red is taken, yellow is buffer time.
-        Click a slot to pre-fill the booking form below.
-      </p>
-      <div class="cal-nav">
-        <button class="cal-nav-btn" onclick="calChangeMonth(-1)">‹</button>
-        <div class="cal-month-label" id="calMonthLabel"></div>
-        <button class="cal-nav-btn" onclick="calChangeMonth(1)">›</button>
-      </div>
-      <div class="cal-dow-row">
-        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
-        <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
-        <div class="cal-dow">Sat</div>
-      </div>
-      <div class="cal-grid" id="calGrid"></div>
-      <div class="cal-legend">
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#27AE60"></div>Available</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-gold)"></div>Partially booked</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-red)"></div>Fully booked</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-border)"></div>Past / unavailable</div>
-      </div>
-      <div class="cal-slots-wrap" id="calSlotsWrap">
-        <div class="cal-slots-title" id="calSlotsTitle"></div>
-        <div class="cal-slots-subtitle" id="calSlotsSubtitle"></div>
-        <div class="slots-legend">
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(39,174,96,0.15)"></div>Available</div>
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(192,57,43,0.12)"></div>Booked</div>
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(200,146,42,0.12)"></div>Buffer time</div>
-        </div>
-        <div class="cal-slots-grid" id="calSlotsGrid"></div>
-        <div class="cal-selected-info" id="calSelectedInfo">
-          <h4>Time slot selected</h4>
-          <p id="calSelectedText"></p>
-          <button class="btn-go-book" onclick="scrollToBookingForm()">Fill in booking form →</button>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <!-- 6. PAST EVENTS GALLERY -->
   <!-- PAST EVENTS SECTION — remove the display:none to show when ready -->
@@ -3246,7 +3248,7 @@
     <div style="max-width:1100px;margin:0 auto">
       <div class="pb-section-label">Backgrounds & Props</div>
       <h2 class="pb-section-title">Set the scene</h2>
-      <p class="pb-section-desc">Primary colour backgrounds are included. Special backgrounds and props are available as add-ons. Click any background to preview it.</p>
+      <p class="pb-section-desc">We use a green screen for your backdrop, so the primary solid colours — white, black, red, blue and grey — are included at no cost. Prefer a custom-designed background? You can enquire and we'll quote it for you. Click any colour below to preview a sample photo.</p>
 
       <div class="bg-grid">
         <div class="bg-card" onclick="openBgPreview('white')" style="cursor:pointer">
@@ -3285,75 +3287,7 @@
   </section>
 
   <!-- 8. BOOKING FORM -->
-  <section class="pb-contact" id="pb-enquiry">
-    <div class="pb-form-wrap">
-      <div class="pb-section-label">Book a Photobooth</div>
-      <h2 class="pb-section-title">Let's make it happen</h2>
-      <p class="pb-section-desc">Fill in the form and we'll get back to you within a few hours to confirm availability and finalise pricing.</p>
 
-      <form id="pbEnquiryForm" onsubmit="submitPbEnquiry(event)">
-        <div class="pb-form-row">
-          <div class="pb-form-group"><label>Your name</label><input type="text" id="pbName" placeholder="Jane Tan" required /></div>
-          <div class="pb-form-group"><label>Email</label><input type="email" id="pbEmail" placeholder="jane@email.com" required /></div>
-        </div>
-        <div class="pb-form-row">
-          <div class="pb-form-group"><label>Event date</label><input type="date" id="pbDate" required /></div>
-          <div class="pb-form-group"><label>Event time</label><input type="time" id="pbTime" required /></div>
-        </div>
-        <div class="pb-form-row">
-          <div class="pb-form-group">
-            <label>Duration (hours)</label>
-            <select id="pbHours">
-              <option value="1">1 hour</option>
-              <option value="2">2 hours</option>
-              <option value="3" selected>3 hours</option>
-              <option value="4">4 hours</option>
-              <option value="5">5 hours</option>
-              <option value="custom">Custom — specify below</option>
-            </select>
-          </div>
-          <div class="pb-form-group">
-            <label>Expected pax</label>
-            <input type="number" id="pbPax" placeholder="e.g. 30" min="1" required />
-          </div>
-        </div>
-        <div class="pb-form-group">
-          <label>Background preference</label>
-          <select id="pbBackground" onchange="pbBgChange()">
-            <option value="Green Screen">Green screen — digital background (included)</option>
-            <option value="white">White backdrop (included)</option>
-            <option value="black">Black backdrop (included)</option>
-            <option value="red">Red backdrop (included)</option>
-            <option value="blue">Blue backdrop (included)</option>
-            <option value="grey">Grey backdrop (included)</option>
-            <option value="special">Custom-made background (+ additional cost)</option>
-          </select>
-          <div class="ib-hint" id="pbBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span></div>
-        </div>
-        <div class="pb-form-group">
-          <label>Props? <span style="color:var(--pb-muted);font-weight:300">(extra cost applies)</span></label>
-          <select id="pbProps">
-            <option value="no">No props needed</option>
-            <option value="yes">Yes, I'd like props (+extra fee)</option>
-          </select>
-        </div>
-        <div class="pb-form-group">
-          <label>Event location / venue</label>
-          <input type="text" id="pbVenue" placeholder="e.g. Suntec City Convention Centre" required />
-        </div>
-        <div class="pb-form-group">
-          <label>Anything else we should know?</label>
-          <textarea id="pbNotes" placeholder="Theme, special requests, or questions..."></textarea>
-        </div>
-        <button type="submit" class="btn-pb-send">Send Booking Enquiry →</button>
-      </form>
-
-      <div class="pb-form-success" id="pbFormSuccess">
-        <h3>Enquiry received</h3>
-        <p>We'll get back to you within a few hours to confirm availability and pricing.</p>
-      </div>
-    </div>
-  </section>
 
 </div><!-- end .page-photobooth -->
 
@@ -4255,17 +4189,14 @@
     document.getElementById('bgPreviewSwatch').textContent = data.emoji;
     document.getElementById('bgPreviewNote').textContent   = data.note;
     const linksEl = document.getElementById('bgPreviewLinks');
-    const imgUrl  = `https://dgclicks.github.io/backgrounds/${key}.jpg`;
+    const imgUrl  = `backgrounds/${key}.jpg`;
     linksEl.innerHTML = `
-      <img src="${imgUrl}" alt="${data.name} example"
+      <img src="${imgUrl}" alt="${data.name} background with guests"
         style="width:100%;object-fit:cover;max-height:280px;margin-bottom:0.8rem"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-      <div style="display:none;flex-direction:column;gap:0.6rem">
-        <p style="font-size:0.78rem;font-weight:300;color:var(--pb-muted);margin-bottom:0.5rem">No photo uploaded yet. Search for examples:</p>
-        ${data.searches.map(s => {
-          const url = `https://www.google.com/search?q=${encodeURIComponent(s.q)}&tbm=isch`;
-          return `<a href="${url}" target="_blank" class="bg-preview-link"><span class="bg-preview-link-icon">🔍</span>${s.label}</a>`;
-        }).join('')}
+      <div style="display:none;flex-direction:column;align-items:center;gap:0.4rem;padding:1.6rem;text-align:center;color:var(--pb-muted)">
+        <div style="font-size:1.6rem">📷</div>
+        <p style="font-size:0.8rem;font-weight:300">Sample photo coming soon.</p>
       </div>`;
     document.getElementById('bgPreviewOverlay').classList.add('open');
   }
@@ -4416,7 +4347,7 @@
     if (timeInput) timeInput.value = `${h}:${mn}`;
   }
 
-  function scrollToBookingForm() { document.getElementById('pb-enquiry').scrollIntoView({ behavior:'smooth' }); }
+  function scrollToBookingForm() { const t = document.getElementById('pb-pricing'); if (t) t.scrollIntoView({ behavior:'smooth' }); }
 
 
   /* ── INSTANT BOOKING ── */
@@ -4511,15 +4442,9 @@
   function ibBgChange() {
     const bg   = (document.getElementById('ibBackground') || {}).value || '';
     const hint = document.getElementById('ibBgHint');
-    if (hint) {
-      if (bg === 'Green Screen') {
-        hint.innerHTML = '<span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span>';
-      } else if (bg === 'Custom') {
-        hint.innerHTML = '<span style="color:var(--pb-gold)">A custom-made background carries an additional cost. This option is quoted by enquiry — you won\'t be asked to pay directly; we\'ll email you a tailored quote.</span>';
-      } else {
-        hint.textContent = '';
-      }
-    }
+    if (hint) hint.innerHTML = (bg === 'Custom')
+      ? "<span style='color:var(--pb-gold)'>A custom-made background carries an additional cost, so this option is quoted by enquiry — you won't be asked to pay directly. We'll email you a tailored quote.</span>"
+      : "<span style='color:var(--pb-gold)'>Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span>";
     if (typeof ibUpdatePriceHint === 'function') ibUpdatePriceHint();
   }
 
@@ -4863,7 +4788,7 @@
               <option value="Grey">Grey backdrop (included)</option>
               <option value="Custom">Custom-made background (+ additional cost)</option>
             </select>
-            <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span></div>
+            <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span></div>
           </div>
         </div>
         <div class="ib-field">
@@ -5853,8 +5778,8 @@ if (_origOpen) {
   }
   function vpbScrollToBooking() {
     vpbCloseResult();
-    if (typeof openInstantBooking === 'function') { openInstantBooking(); return; }
-    const target = document.getElementById('pb-enquiry');
+    if (typeof openInstantBook === 'function') { openInstantBook(); return; }
+    const target = document.getElementById('pb-pricing');
     if (target) target.scrollIntoView({ behavior: 'smooth' });
   }
 
