@@ -3319,14 +3319,16 @@
         </div>
         <div class="pb-form-group">
           <label>Background preference</label>
-          <select id="pbBackground">
-            <option value="white">White (included)</option>
-            <option value="black">Black (included)</option>
-            <option value="red">Red (included)</option>
-            <option value="blue">Blue (included)</option>
-            <option value="grey">Grey (included)</option>
-            <option value="special">Special / Custom background (+extra fee)</option>
+          <select id="pbBackground" onchange="pbBgChange()">
+            <option value="Green Screen">Green screen — digital background (included)</option>
+            <option value="white">White backdrop (included)</option>
+            <option value="black">Black backdrop (included)</option>
+            <option value="red">Red backdrop (included)</option>
+            <option value="blue">Blue backdrop (included)</option>
+            <option value="grey">Grey backdrop (included)</option>
+            <option value="special">Custom-made background (+ additional cost)</option>
           </select>
+          <div class="ib-hint" id="pbBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span></div>
         </div>
         <div class="pb-form-group">
           <label>Props? <span style="color:var(--pb-muted);font-weight:300">(extra cost applies)</span></label>
@@ -4505,12 +4507,44 @@
     }
   }
 
+  // Background choice → show the green-screen caution or the custom-cost / enquiry notice.
+  function ibBgChange() {
+    const bg   = (document.getElementById('ibBackground') || {}).value || '';
+    const hint = document.getElementById('ibBgHint');
+    if (hint) {
+      if (bg === 'Green Screen') {
+        hint.innerHTML = '<span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span>';
+      } else if (bg === 'Custom') {
+        hint.innerHTML = '<span style="color:var(--pb-gold)">A custom-made background carries an additional cost. This option is quoted by enquiry — you won\'t be asked to pay directly; we\'ll email you a tailored quote.</span>';
+      } else {
+        hint.textContent = '';
+      }
+    }
+    if (typeof ibUpdatePriceHint === 'function') ibUpdatePriceHint();
+  }
+
+  // Same background guidance on the enquiry form.
+  function pbBgChange() {
+    const bg   = (document.getElementById('pbBackground') || {}).value || '';
+    const hint = document.getElementById('pbBgHint');
+    if (!hint) return;
+    if (bg === 'Green Screen') {
+      hint.innerHTML = '<span style="color:var(--pb-gold)">⚠️ Guests should avoid wearing green or colours close to green — they can blend into the green screen.</span>';
+    } else if (bg === 'special') {
+      hint.innerHTML = '<span style="color:var(--pb-gold)">A custom-made background carries an additional cost — we\'ll include it in your quote.</span>';
+    } else {
+      hint.textContent = '';
+    }
+  }
+
   function ibCalcPrice() {
     const time     = document.getElementById('ibTime').value || '12:00';
     const duration = parseFloat(document.getElementById('ibDuration').value) || 2.5;
     const props    = document.getElementById('ibProps').value;
     const pax      = parseInt(document.getElementById('ibPax').value) || 0;
-    const quoteOnly = pax > 50; // >50 pax — price to be quoted
+    const bg        = (document.getElementById('ibBackground') || {}).value || '';
+    const customBg  = (bg === 'Custom');
+    const quoteOnly = pax > 50 || customBg; // >50 pax OR custom background → enquiry, no direct pay
 
     const startH   = parseInt(time.split(':')[0]);
     const startMin = parseInt(time.split(':')[1]);
@@ -4655,6 +4689,15 @@
         // Show quote section, hide PayNow
         document.getElementById('ibPayNowSection').style.display = 'none';
         document.getElementById('ibQuoteSection').style.display = '';
+        const _bgSel = (document.getElementById('ibBackground') || {}).value || '';
+        const _qmsg  = document.getElementById('ibQuoteMsg');
+        if (_qmsg) {
+          if (_bgSel === 'Custom') {
+            _qmsg.textContent = "You've chosen a custom-made background, which carries an additional cost — so we'll tailor a quote instead of taking payment now. We'll email you the quote within 2 hours. No payment is required now.";
+          } else {
+            _qmsg.textContent = "Your event has more than 50 pax. We'll review your booking and send you a custom quote via email within 2 hours. No payment is required now.";
+          }
+        }
         document.getElementById('ibStep4Note').textContent = "Tap below to submit your booking request. We'll get back to you within 2 hours.";
       } else {
         document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
@@ -4811,13 +4854,16 @@
           </div>
           <div class="ib-field">
             <label>Background colour</label>
-            <select id="ibBackground">
-              <option value="White">White</option>
-              <option value="Black">Black</option>
-              <option value="Red">Red</option>
-              <option value="Blue">Blue</option>
-              <option value="Grey">Grey</option>
+            <select id="ibBackground" onchange="ibBgChange()">
+              <option value="Green Screen">Green screen — digital background (included)</option>
+              <option value="White">White backdrop (included)</option>
+              <option value="Black">Black backdrop (included)</option>
+              <option value="Red">Red backdrop (included)</option>
+              <option value="Blue">Blue backdrop (included)</option>
+              <option value="Grey">Grey backdrop (included)</option>
+              <option value="Custom">Custom-made background (+ additional cost)</option>
             </select>
+            <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">⚠️ Please avoid wearing green or colours close to green — they can blend into the green screen and disappear from your photos.</span></div>
           </div>
         </div>
         <div class="ib-field">
@@ -4959,7 +5005,7 @@
         <div id="ibQuoteSection" style="display:none;text-align:center;padding:1.5rem 0;">
           <div style="font-size:2rem;margin-bottom:0.8rem">📋</div>
           <div style="font-size:1rem;font-weight:500;color:var(--pb-gold);margin-bottom:0.5rem;">Pricing will be quoted</div>
-          <p style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;max-width:340px;margin:0 auto 1rem;">
+          <p id="ibQuoteMsg" style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;max-width:340px;margin:0 auto 1rem;">
             Your event has more than 50 pax. We'll review your booking and send you a custom quote via email within 2 hours.
             No payment is required now.
           </p>
