@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DGClicks — Cameras & Photobooth Singapore</title>
-  <!-- Perf: open connections early so fonts + backend start sooner -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://dgclicks.github.io" />
   <link rel="preconnect" href="https://digicam-venture.onrender.com" />
-  <link rel="dns-prefetch" href="https://digicam-venture.onrender.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Dancing+Script:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet" />
   <style>
 
@@ -1616,6 +1615,16 @@
     .ib-field textarea { min-height: 80px; resize: vertical; }
     .ib-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .ib-field .ib-hint { font-size: 0.68rem; color: var(--pb-muted); margin-top: 3px; }
+    .ib-venue-suggest {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
+      background: var(--pb-card); border: 1px solid var(--pb-border); border-top: none;
+      max-height: 240px; overflow-y: auto; box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    }
+    .ib-venue-item { padding: 0.55rem 0.7rem; cursor: pointer; border-bottom: 1px solid var(--pb-border); }
+    .ib-venue-item:last-child { border-bottom: none; }
+    .ib-venue-item:hover { background: rgba(200,146,42,0.08); }
+    .ib-venue-main { font-size: 0.82rem; color: var(--pb-text); }
+    .ib-venue-sub  { font-size: 0.7rem; color: var(--pb-muted); margin-top: 2px; }
 
     /* Price summary box */
     .ib-summary {
@@ -1966,11 +1975,10 @@
     /* Scroll SCENE: tall so scroll drives the intro; inner .gx-hero-pin pins */
     .gx-hero {
       position: relative;
-      height: 220vh;                 /* 1.2 extra viewports of scroll to play the intro */
     }
     .gx-hero-pin {
-      position: sticky; top: 0;
-      height: 100vh; overflow: hidden;
+      position: relative;
+      min-height: 100vh; overflow: hidden;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center;
@@ -1987,8 +1995,8 @@
       content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
       background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(5,4,3,0.55) 100%);
     }
-    /* text hidden until the camera completes its turn (JS drives opacity) */
-    .gx-copy { opacity: 0; }
+    /* text visible by default; the (now optional) scroll reveal only deepens it */
+    .gx-copy { opacity: 1; }
 
     .gx-stage {
       position: relative; z-index: 2;
@@ -2466,7 +2474,7 @@
 
     /* Lite mode: weak/mobile devices. Settle animations instantly (end-states kept,
        so nothing disappears) to kill the continuous main-thread work that freezes
-       low-end phones on load. Scoped to html.lite, so desktop is untouched. */
+       phones on load. Scoped to html.lite so full-power desktop is untouched. */
     html.lite *, html.lite *::before, html.lite *::after {
       animation-duration: 0.01ms !important;
       animation-delay: 0ms !important;
@@ -2475,6 +2483,7 @@
       transition-delay: 0ms !important;
       scroll-behavior: auto !important;
     }
+
 </style>
   <script type="importmap">
   {
@@ -2570,7 +2579,7 @@
       <h1 class="gx-title">Some moments deserve<br/>to last <em>forever.</em></h1>
       <p class="gx-sub">Curated secondhand digital cameras, personally tested and fairly priced. For those who still believe in a real photograph.</p>
       <div class="gx-btns">
-        <button class="btn-primary magnetic" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Browse Cameras</button>
+        <button class="btn-primary magnetic" onclick="jumpTo('shop')">Browse Cameras</button>
         <a href="https://t.me/dgclicks_26" target="_blank" class="btn-secondary magnetic">Join Our Channel</a>
       </div>
       <div class="hero-stats" style="margin-top:2.4rem">
@@ -2711,8 +2720,8 @@
       <h1 class="gx-title">Every party deserves<br/>a <em>print</em> to remember.</h1>
       <p class="gx-sub">Professional photobooth delivered to your venue. Unlimited prints, colourful backgrounds, and real photos people can hold.</p>
       <div class="gx-btns">
-        <button class="btn-pb-primary magnetic" onclick="document.getElementById('pb-calendar').scrollIntoView({behavior:'smooth'})">Check Availability</button>
-        <button class="btn-pb-secondary magnetic" onclick="document.getElementById('pb-pricing').scrollIntoView({behavior:'smooth'})">See Pricing</button>
+        <button class="btn-pb-primary magnetic" onclick="jumpTo('pb-calendar')">Check Availability</button>
+        <button class="btn-pb-secondary magnetic" onclick="jumpTo('pb-pricing')">See Pricing</button>
       </div>
 
     <!-- Colour swatches -->
@@ -3074,6 +3083,49 @@
     </div>
   </div>
 
+  <section class="pb-calendar-section" id="pb-calendar">
+    <div class="cal-wrap">
+      <div class="pb-section-label">Availability</div>
+      <h2 class="pb-section-title">Check available dates</h2>
+      <p class="pb-section-desc">
+        Click a date to see available time slots. Green is free, red is taken, yellow is buffer time.
+        Click a slot to pre-fill the booking form below.
+      </p>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calChangeMonth(-1)">‹</button>
+        <div class="cal-month-label" id="calMonthLabel"></div>
+        <button class="cal-nav-btn" onclick="calChangeMonth(1)">›</button>
+      </div>
+      <div class="cal-dow-row">
+        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+        <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
+        <div class="cal-dow">Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#27AE60"></div>Available</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-gold)"></div>Partially booked</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-red)"></div>Fully booked</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-border)"></div>Past / unavailable</div>
+      </div>
+      <div class="cal-slots-wrap" id="calSlotsWrap">
+        <div class="cal-slots-title" id="calSlotsTitle"></div>
+        <div class="cal-slots-subtitle" id="calSlotsSubtitle"></div>
+        <div class="slots-legend">
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(39,174,96,0.15)"></div>Available</div>
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(192,57,43,0.12)"></div>Booked</div>
+          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(200,146,42,0.12)"></div>Buffer time</div>
+        </div>
+        <div class="cal-slots-grid" id="calSlotsGrid"></div>
+        <div class="cal-selected-info" id="calSelectedInfo">
+          <h4>Time slot selected</h4>
+          <p id="calSelectedText"></p>
+          <button class="btn-go-book" onclick="scrollToBookingForm()">Fill in booking form →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="pb-section" id="pb-pricing" style="background:var(--pb-card);border-top:1px solid var(--pb-border)">
     <div style="max-width:1100px;margin:0 auto">
       <div class="pb-section-label">Pricing</div>
@@ -3132,7 +3184,7 @@
               <li>Custom branding on prints</li>
               <li class="extra">Tailored quote provided</li>
             </ul>
-            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="document.getElementById('pb-enquiry').scrollIntoView({behavior:'smooth'})">Send Enquiry →</button>
+            <button class="btn-pb-secondary" style="width:100%;border-color:var(--pb-border)" onclick="openInstantBook()">Send Enquiry →</button>
           </div>
         </div>
 
@@ -3154,48 +3206,7 @@
   </section>
 
   <!-- 5. AVAILABILITY CALENDAR -->
-  <section class="pb-calendar-section" id="pb-calendar">
-    <div class="cal-wrap">
-      <div class="pb-section-label">Availability</div>
-      <h2 class="pb-section-title">Check available dates</h2>
-      <p class="pb-section-desc">
-        Click a date to see available time slots. Green is free, red is taken, yellow is buffer time.
-        Click a slot to pre-fill the booking form below.
-      </p>
-      <div class="cal-nav">
-        <button class="cal-nav-btn" onclick="calChangeMonth(-1)">‹</button>
-        <div class="cal-month-label" id="calMonthLabel"></div>
-        <button class="cal-nav-btn" onclick="calChangeMonth(1)">›</button>
-      </div>
-      <div class="cal-dow-row">
-        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
-        <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
-        <div class="cal-dow">Sat</div>
-      </div>
-      <div class="cal-grid" id="calGrid"></div>
-      <div class="cal-legend">
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#27AE60"></div>Available</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-gold)"></div>Partially booked</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-red)"></div>Fully booked</div>
-        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--pb-border)"></div>Past / unavailable</div>
-      </div>
-      <div class="cal-slots-wrap" id="calSlotsWrap">
-        <div class="cal-slots-title" id="calSlotsTitle"></div>
-        <div class="cal-slots-subtitle" id="calSlotsSubtitle"></div>
-        <div class="slots-legend">
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(39,174,96,0.15)"></div>Available</div>
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(192,57,43,0.12)"></div>Booked</div>
-          <div class="slots-legend-item"><div class="slots-legend-box" style="background:rgba(200,146,42,0.12)"></div>Buffer time</div>
-        </div>
-        <div class="cal-slots-grid" id="calSlotsGrid"></div>
-        <div class="cal-selected-info" id="calSelectedInfo">
-          <h4>Time slot selected</h4>
-          <p id="calSelectedText"></p>
-          <button class="btn-go-book" onclick="scrollToBookingForm()">Fill in booking form →</button>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <!-- 6. PAST EVENTS GALLERY -->
   <!-- PAST EVENTS SECTION — remove the display:none to show when ready -->
@@ -3208,31 +3219,31 @@
         <!-- Replace these with real event photos -->
         <!-- Upload to /images/event-1.jpg etc on your GitHub repo -->
         <div class="gallery-item tall">
-          <img src="https://dgclicks.github.io/images/event-1.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-1.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 1</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Birthday · Pink background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-2.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-2.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 2</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Corporate · White background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-3.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-3.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 3</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">21st Birthday · Black background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-4.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-4.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 4</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Prom Night · Blue background</div></div>
         </div>
         <div class="gallery-item">
-          <img src="https://dgclicks.github.io/images/event-5.jpg" alt="Event photo"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/event-5.jpg" alt="Event photo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="gallery-placeholder" style="display:none">📷<span>Event photo 5</span></div>
           <div class="gallery-overlay"><div class="gallery-caption">Wedding · Special background</div></div>
@@ -3247,7 +3258,7 @@
     <div style="max-width:1100px;margin:0 auto">
       <div class="pb-section-label">Backgrounds & Props</div>
       <h2 class="pb-section-title">Set the scene</h2>
-      <p class="pb-section-desc">Primary colour backgrounds are included. Special backgrounds and props are available as add-ons. Click any background to preview it.</p>
+      <p class="pb-section-desc">We use a green screen for your backdrop, so the primary solid colours — white, black, red, blue and grey — are included at no cost. Prefer a custom-designed background? You can enquire and we'll quote it for you. Click any colour below to preview a sample photo.</p>
 
       <div class="bg-grid">
         <div class="bg-card" onclick="openBgPreview('white')" style="cursor:pointer">
@@ -3286,73 +3297,7 @@
   </section>
 
   <!-- 8. BOOKING FORM -->
-  <section class="pb-contact" id="pb-enquiry">
-    <div class="pb-form-wrap">
-      <div class="pb-section-label">Book a Photobooth</div>
-      <h2 class="pb-section-title">Let's make it happen</h2>
-      <p class="pb-section-desc">Fill in the form and we'll get back to you within a few hours to confirm availability and finalise pricing.</p>
 
-      <form id="pbEnquiryForm" onsubmit="submitPbEnquiry(event)">
-        <div class="pb-form-row">
-          <div class="pb-form-group"><label>Your name</label><input type="text" id="pbName" placeholder="Jane Tan" required /></div>
-          <div class="pb-form-group"><label>Email</label><input type="email" id="pbEmail" placeholder="jane@email.com" required /></div>
-        </div>
-        <div class="pb-form-row">
-          <div class="pb-form-group"><label>Event date</label><input type="date" id="pbDate" required /></div>
-          <div class="pb-form-group"><label>Event time</label><input type="time" id="pbTime" required /></div>
-        </div>
-        <div class="pb-form-row">
-          <div class="pb-form-group">
-            <label>Duration (hours)</label>
-            <select id="pbHours">
-              <option value="1">1 hour</option>
-              <option value="2">2 hours</option>
-              <option value="3" selected>3 hours</option>
-              <option value="4">4 hours</option>
-              <option value="5">5 hours</option>
-              <option value="custom">Custom — specify below</option>
-            </select>
-          </div>
-          <div class="pb-form-group">
-            <label>Expected pax</label>
-            <input type="number" id="pbPax" placeholder="e.g. 30" min="1" required />
-          </div>
-        </div>
-        <div class="pb-form-group">
-          <label>Background preference</label>
-          <select id="pbBackground">
-            <option value="white">White (included)</option>
-            <option value="black">Black (included)</option>
-            <option value="red">Red (included)</option>
-            <option value="blue">Blue (included)</option>
-            <option value="grey">Grey (included)</option>
-            <option value="special">Special / Custom background (+extra fee)</option>
-          </select>
-        </div>
-        <div class="pb-form-group">
-          <label>Props? <span style="color:var(--pb-muted);font-weight:300">(extra cost applies)</span></label>
-          <select id="pbProps">
-            <option value="no">No props needed</option>
-            <option value="yes">Yes, I'd like props (+extra fee)</option>
-          </select>
-        </div>
-        <div class="pb-form-group">
-          <label>Event location / venue</label>
-          <input type="text" id="pbVenue" placeholder="e.g. Suntec City Convention Centre" required />
-        </div>
-        <div class="pb-form-group">
-          <label>Anything else we should know?</label>
-          <textarea id="pbNotes" placeholder="Theme, special requests, or questions..."></textarea>
-        </div>
-        <button type="submit" class="btn-pb-send">Send Booking Enquiry →</button>
-      </form>
-
-      <div class="pb-form-success" id="pbFormSuccess">
-        <h3>Enquiry received</h3>
-        <p>We'll get back to you within a few hours to confirm availability and pricing.</p>
-      </div>
-    </div>
-  </section>
 
 </div><!-- end .page-photobooth -->
 
@@ -3593,28 +3538,55 @@
 
   /* ------ TAB SWITCHING ------ */
   window.addEventListener('load', () => {
+    if (document.body.__tabInit) return;   // already initialised on DOMContentLoaded
     const params = new URLSearchParams(window.location.search);
-    // Default to photobooth since digicam tab is hidden
     const tab = params.get('tab') === 'digicam' ? 'digicam' : 'photobooth';
-    switchTab(tab);
+    switchTab(tab, true);                   // init only — never yank the user's scroll to top
+    document.body.__tabInit = true;
+  });
+  // Also run on DOMContentLoaded so the page initialises even if `load` never
+  // fires (a hanging CDN image / font would otherwise leave it half-set-up).
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.body.__tabInit) return;
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') === 'digicam' ? 'digicam' : 'photobooth';
+    switchTab(tab, true);
+    document.body.__tabInit = true;
   });
 
-  function switchTab(tab) {
+  function switchTab(tab, skipScroll) {
     const tabs   = document.querySelectorAll('.nav-tab');
     const ticker = document.getElementById('tickerInner');
     tabs[0].classList.toggle('active', tab === 'digicam');
     tabs[1].classList.toggle('active', tab === 'photobooth');
     document.body.classList.toggle('pb-mode', tab === 'photobooth');
     ticker.innerHTML = tab === 'photobooth' ? TICKER_PHOTOBOOTH : TICKER_DIGICAM;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!skipScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Robust in-page scroll: lands the target just below the sticky nav, and
+  // (unlike scrollIntoView) is never clobbered by a competing scroll.
+  function jumpTo(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const navH = (document.querySelector('nav')?.offsetHeight || 0) + 12;
+    const y = el.getBoundingClientRect().top + window.scrollY - navH;
+    const start = window.scrollY;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    // Fallback for contexts where window.scrollTo is a no-op: land below the
+    // sticky nav via scroll-margin-top so the section header isn't hidden.
+    setTimeout(() => {
+      if (Math.abs(window.scrollY - start) < 2 && Math.abs(y - start) > 4) {
+        el.style.scrollMarginTop = navH + 'px';
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 400);
+  }
+  window.jumpTo = jumpTo;
 
   function scrollToSection(sectionId, tab) {
     switchTab(tab);
-    setTimeout(() => {
-      const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+    setTimeout(() => jumpTo(sectionId), 300);
   }
 
   /* ------ SCROLL REVEAL OBSERVER ------ */
@@ -3738,7 +3710,7 @@
     const angles = ['Main', 'Top', 'Side', 'Lens'];
     document.getElementById('camImgThumbs').innerHTML = angles.map((lbl, i) => `
       <div class="cam-img-thumb ${i===0?'active':''}" onclick="switchCamImg('${cam.id}', ${i}, this)">
-        <img src="https://dgclicks.github.io/images/${cam.id}-${i}.jpg" alt="${lbl}"
+        <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/${cam.id}-${i}.jpg" alt="${lbl}"
           onerror="this.parentElement.innerHTML='<span style=font-size:1rem>${['📷','⬆','◀','🔍'][i]}</span>'" />
       </div>
     `).join('');
@@ -3963,7 +3935,7 @@
         role="button" tabindex="0"
         aria-label="${c.brand} ${c.model}">
         <div class="card-img">
-          <img src="https://dgclicks.github.io/images/${c.id}.jpg" alt="${c.brand} ${c.model}"
+          <img loading="lazy" decoding="async" src="https://dgclicks.github.io/images/${c.id}.jpg" alt="${c.brand} ${c.model}"
             onerror="this.classList.add('hidden');this.nextElementSibling.style.display='block'" />
           <span class="fallback-emoji" style="display:none">${c.emoji}</span>
           <span class="badge ${badgeClass(c.condition)}">${c.condition}</span>
@@ -4227,17 +4199,14 @@
     document.getElementById('bgPreviewSwatch').textContent = data.emoji;
     document.getElementById('bgPreviewNote').textContent   = data.note;
     const linksEl = document.getElementById('bgPreviewLinks');
-    const imgUrl  = `https://dgclicks.github.io/backgrounds/${key}.jpg`;
+    const imgUrl  = `backgrounds/${key}.jpg`;
     linksEl.innerHTML = `
-      <img src="${imgUrl}" alt="${data.name} example"
+      <img src="${imgUrl}" alt="${data.name} background with guests"
         style="width:100%;object-fit:cover;max-height:280px;margin-bottom:0.8rem"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-      <div style="display:none;flex-direction:column;gap:0.6rem">
-        <p style="font-size:0.78rem;font-weight:300;color:var(--pb-muted);margin-bottom:0.5rem">No photo uploaded yet. Search for examples:</p>
-        ${data.searches.map(s => {
-          const url = `https://www.google.com/search?q=${encodeURIComponent(s.q)}&tbm=isch`;
-          return `<a href="${url}" target="_blank" class="bg-preview-link"><span class="bg-preview-link-icon">🔍</span>${s.label}</a>`;
-        }).join('')}
+      <div style="display:none;flex-direction:column;align-items:center;gap:0.4rem;padding:1.6rem;text-align:center;color:var(--pb-muted)">
+        <div style="font-size:1.6rem">📷</div>
+        <p style="font-size:0.8rem;font-weight:300">Sample photo coming soon.</p>
       </div>`;
     document.getElementById('bgPreviewOverlay').classList.add('open');
   }
@@ -4388,7 +4357,7 @@
     if (timeInput) timeInput.value = `${h}:${mn}`;
   }
 
-  function scrollToBookingForm() { document.getElementById('pb-enquiry').scrollIntoView({ behavior:'smooth' }); }
+  function scrollToBookingForm() { const t = document.getElementById('pb-pricing'); if (t) t.scrollIntoView({ behavior:'smooth' }); }
 
 
   /* ── INSTANT BOOKING ── */
@@ -4479,12 +4448,77 @@
     }
   }
 
+  // Background choice → show the green-screen caution or the custom-cost / enquiry notice.
+  function ibBgChange() {
+    const bg   = (document.getElementById('ibBackground') || {}).value || '';
+    const hint = document.getElementById('ibBgHint');
+    if (hint) hint.innerHTML = (bg === 'Custom')
+      ? "<span style='color:var(--pb-gold)'>A custom-made background carries an additional cost, so this option is quoted by enquiry — you won't be asked to pay directly. We'll email you a tailored quote.</span>"
+      : "<span style='color:var(--pb-gold)'>Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span>";
+    if (typeof ibUpdatePriceHint === 'function') ibUpdatePriceHint();
+  }
+
+  // Same background guidance on the enquiry form.
+  function pbBgChange() {
+    const bg   = (document.getElementById('pbBackground') || {}).value || '';
+    const hint = document.getElementById('pbBgHint');
+    if (!hint) return;
+    if (bg === 'Green Screen') {
+      hint.innerHTML = '<span style="color:var(--pb-gold)">⚠️ Guests should avoid wearing green or colours close to green — they can blend into the green screen.</span>';
+    } else if (bg === 'special') {
+      hint.innerHTML = '<span style="color:var(--pb-gold)">A custom-made background carries an additional cost — we\'ll include it in your quote.</span>';
+    } else {
+      hint.textContent = '';
+    }
+  }
+
+  // ── VENUE ADDRESS AUTOCOMPLETE (OneMap via your backend) ──
+  let _ibVenueTimer = null, _ibVenueResults = [];
+  function _escHtml(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function ibVenueSearch() {
+    const inp = document.getElementById('ibVenue');
+    const box = document.getElementById('ibVenueSuggest');
+    if (!inp || !box) return;
+    const q = inp.value.trim();
+    clearTimeout(_ibVenueTimer);
+    if (q.length < 3) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    _ibVenueTimer = setTimeout(async () => {
+      try {
+        const res  = await fetchT(BACKEND_URL + '/api/address-search?q=' + encodeURIComponent(q), {}, 8000);
+        const data = await res.json();
+        const list = (data && data.results) || [];
+        _ibVenueResults = list;
+        if (!list.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+        box.innerHTML = list.map((r, i) => {
+          const label = (r.building && r.building !== 'NIL') ? r.building : (r.road || r.address || '');
+          return '<div class="ib-venue-item" onmousedown="ibVenuePick(' + i + ')">' +
+                   '<div class="ib-venue-main">' + _escHtml(label) + '</div>' +
+                   '<div class="ib-venue-sub">'  + _escHtml(r.address || '') + '</div>' +
+                 '</div>';
+        }).join('');
+        box.style.display = 'block';
+      } catch (e) { box.style.display = 'none'; }
+    }, 300);
+  }
+  function ibVenuePick(i) {
+    const r = _ibVenueResults[i]; if (!r) return;
+    const inp = document.getElementById('ibVenue');
+    if (inp) inp.value = r.address || '';
+    const box = document.getElementById('ibVenueSuggest');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+  }
+  function ibVenueBlur() {
+    setTimeout(() => { const box = document.getElementById('ibVenueSuggest'); if (box) box.style.display = 'none'; }, 180);
+  }
+
   function ibCalcPrice() {
     const time     = document.getElementById('ibTime').value || '12:00';
     const duration = parseFloat(document.getElementById('ibDuration').value) || 2.5;
     const props    = document.getElementById('ibProps').value;
     const pax      = parseInt(document.getElementById('ibPax').value) || 0;
-    const quoteOnly = pax > 50; // >50 pax — price to be quoted
+    const bg        = (document.getElementById('ibBackground') || {}).value || '';
+    const customBg  = (bg === 'Custom');
+    const quoteOnly = pax > 50 || customBg; // >50 pax OR custom background → enquiry, no direct pay
 
     const startH   = parseInt(time.split(':')[0]);
     const startMin = parseInt(time.split(':')[1]);
@@ -4629,6 +4663,15 @@
         // Show quote section, hide PayNow
         document.getElementById('ibPayNowSection').style.display = 'none';
         document.getElementById('ibQuoteSection').style.display = '';
+        const _bgSel = (document.getElementById('ibBackground') || {}).value || '';
+        const _qmsg  = document.getElementById('ibQuoteMsg');
+        if (_qmsg) {
+          if (_bgSel === 'Custom') {
+            _qmsg.textContent = "You've chosen a custom-made background, which carries an additional cost — so we'll tailor a quote instead of taking payment now. We'll email you the quote within 2 hours. No payment is required now.";
+          } else {
+            _qmsg.textContent = "Your event has more than 50 pax. We'll review your booking and send you a custom quote via email within 2 hours. No payment is required now.";
+          }
+        }
         document.getElementById('ibStep4Note').textContent = "Tap below to submit your booking request. We'll get back to you within 2 hours.";
       } else {
         document.getElementById('ibPayAmount').textContent = `S$${p.total}`;
@@ -4775,7 +4818,10 @@
         </div>
         <div class="ib-field">
           <label>Event venue / address</label>
-          <input type="text" id="ibVenue" placeholder="e.g. Suntec City Convention Centre, Level 3" />
+          <div style="position:relative">
+            <input type="text" id="ibVenue" placeholder="e.g. Suntec City Convention Centre, Level 3" autocomplete="off" oninput="ibVenueSearch()" onblur="ibVenueBlur()" />
+            <div id="ibVenueSuggest" class="ib-venue-suggest" style="display:none"></div>
+          </div>
         </div>
         <div class="ib-row">
           <div class="ib-field">
@@ -4785,13 +4831,16 @@
           </div>
           <div class="ib-field">
             <label>Background colour</label>
-            <select id="ibBackground">
-              <option value="White">White</option>
-              <option value="Black">Black</option>
-              <option value="Red">Red</option>
-              <option value="Blue">Blue</option>
-              <option value="Grey">Grey</option>
+            <select id="ibBackground" onchange="ibBgChange()">
+              <option value="Green Screen">Green screen — digital background (included)</option>
+              <option value="White">White backdrop (included)</option>
+              <option value="Black">Black backdrop (included)</option>
+              <option value="Red">Red backdrop (included)</option>
+              <option value="Blue">Blue backdrop (included)</option>
+              <option value="Grey">Grey backdrop (included)</option>
+              <option value="Custom">Custom-made background (+ additional cost)</option>
             </select>
+            <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">Green screen gives a clean solid-colour background (white, black, red, blue or grey) at no cost. ⚠️ Please avoid wearing green or colours close to green. Want a designed / custom background? Choose “Custom” and we'll quote it by enquiry.</span></div>
           </div>
         </div>
         <div class="ib-field">
@@ -4916,7 +4965,7 @@
           <div class="ib-paynow-num">+65 8518 7046</div>
           <div class="ib-paynow-amount">Amount to pay: <strong id="ibPayAmount">S$0</strong></div>
           <div class="ib-qr" id="ibQrCode">
-            <img src="/images/paynow-qr.png"
+            <img src="https://dgclicks.github.io/images/paynow-qr.png"
               alt="PayNow QR" style="width:100%;height:100%;object-fit:contain"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
             <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.65rem;color:#555;text-align:center;gap:4px">
@@ -4933,7 +4982,7 @@
         <div id="ibQuoteSection" style="display:none;text-align:center;padding:1.5rem 0;">
           <div style="font-size:2rem;margin-bottom:0.8rem">📋</div>
           <div style="font-size:1rem;font-weight:500;color:var(--pb-gold);margin-bottom:0.5rem;">Pricing will be quoted</div>
-          <p style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;max-width:340px;margin:0 auto 1rem;">
+          <p id="ibQuoteMsg" style="font-size:0.82rem;font-weight:300;color:var(--pb-muted);line-height:1.7;max-width:340px;margin:0 auto 1rem;">
             Your event has more than 50 pax. We'll review your booking and send you a custom quote via email within 2 hours.
             No payment is required now.
           </p>
@@ -4970,13 +5019,24 @@
 // ============================================================
 // 3D CAMERA VIEWER — Three.js r160
 // ============================================================
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+// Three.js is heavy (~600KB) and was previously downloaded on EVERY page load,
+// even though the 3D viewer is only used when a visitor opens a camera's 3D tab.
+// Load it lazily instead so it never blocks initial page load.
+let THREE = null, GLTFLoader = null;
+async function ensureThree() {
+  if (THREE) return;
+  const [t, g] = await Promise.all([
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js')
+  ]);
+  THREE = t;
+  GLTFLoader = g.GLTFLoader;
+}
 
 // Map camera IDs to their GLB model URLs and spec chips
 const CAMERA_MODELS = {
   'CAM-001': {
-    url: '/models/canon_g7x__camera_model.glb',
+    url: 'https://dgclicks-26.github.io/dgclicks.github.io/models/canon_g7x__camera_model.glb',
     chips: ['f/1.8 Lens', '20.1MP', '4K Video', 'Tilt LCD']
   }
 };
@@ -5033,11 +5093,13 @@ function dispose3D() {
   scene = null; camera3d = null; modelGroup = null;
 }
 
-function init3DViewer(glbUrl, chips) {
+async function init3DViewer(glbUrl, chips) {
   dispose3D();
   const wrap = document.getElementById('cam3dWrap');
   if (!wrap) return;
   currentWrap = wrap;
+  await ensureThree();          // pull in Three.js on demand (spinner already showing)
+  if (currentWrap !== wrap) return;  // user closed/switched while loading
 
   // Show chips
   const chipsEl = document.getElementById('cam3dChips');
@@ -5768,8 +5830,8 @@ if (_origOpen) {
   }
   function vpbScrollToBooking() {
     vpbCloseResult();
-    if (typeof openInstantBooking === 'function') { openInstantBooking(); return; }
-    const target = document.getElementById('pb-enquiry');
+    if (typeof openInstantBook === 'function') { openInstantBook(); return; }
+    const target = document.getElementById('pb-pricing');
     if (target) target.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -6064,16 +6126,42 @@ if (_origOpen) {
 
 <script>
 (function(){
-  // Low-power / mobile devices take the same lightweight path as "reduce motion":
-  // this skips the scroll-spin, reveal animations, parallax and count-ups that peg
-  // the main thread on load (the ~4s freeze seen on phones). Desktop is unaffected.
+  // SPEED MODE — serves the lightweight, static version that doesn't freeze on load.
+  // LITE_ALL = true  -> fast on EVERY device (desktop included).
+  // LITE_ALL = false -> full animations on desktop, lite only on phones/small screens.
+  const LITE_ALL = true;
   const _prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const _lowPower = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  const _lowPower = LITE_ALL
+                    || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
                     || ((navigator.hardwareConcurrency || 8) <= 4)
                     || window.matchMedia('(max-width: 820px)').matches;
   if (_lowPower) document.documentElement.classList.add('lite');
   const reduce = _prefersReduce || _lowPower;
   const fine   = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---------- SCROLL-LOCK WATCHDOG (bulletproof) ----------
+     Several overlays set body.overflow='hidden' while open. If one ever fails
+     to reset (interrupted close, error mid-handler), the page becomes
+     un-scrollable with no visible overlay. This guard clears any stray lock
+     whenever the user tries to scroll and NOTHING is actually open. */
+  const LOCKERS = ['#buyModal.open','.modal-overlay.open','#camDetailOverlay.open','.cam-detail-overlay.open',
+    '.img-zoom-overlay.open','.ib-overlay.open','.bg-preview-overlay.open','.vpb-result.open',
+    '#vpbCameraModal.open','.vpb-camera-modal.open','#dsOverlay.open','.ds-overlay.open'];
+  const somethingOpen = () => LOCKERS.some(s => {
+    const e = document.querySelector(s);
+    return e && (e.offsetParent !== null || getComputedStyle(e).display !== 'none');
+  });
+  const unlockIfStray = () => {
+    if (somethingOpen()) return;
+    const b = document.body.style, h = document.documentElement.style;
+    if (b.overflow === 'hidden' || b.overflowY === 'hidden') { b.overflow = ''; b.overflowY = ''; b.overflowX = 'clip'; }
+    if (h.overflow === 'hidden' || h.overflowY === 'hidden') { h.overflow = ''; h.overflowY = ''; }
+    if (b.position === 'fixed') { b.position = ''; }
+  };
+  ['wheel','touchstart','keydown','pointerdown'].forEach(ev =>
+    addEventListener(ev, unlockIfStray, { passive: true }));
+  setInterval(unlockIfStray, 1500);   // catch-all
+  unlockIfStray();
 
   /* ---------- Scrolling: NATIVE (bulletproof) ----------
      A wheel-hijacking smooth-scroll library used to run here, but it could
@@ -6193,7 +6281,7 @@ if (_origOpen) {
       const st = h.querySelector('.gx-stage'), cp = h.querySelector('.gx-copy'), sh = h.querySelector('.gx-scrollhint');
       const total = h.offsetHeight - innerHeight;                 // scroll distance inside the scene
       const rect = h.getBoundingClientRect();
-      const prog = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 1;
+      const prog = total > innerHeight * 0.5 ? Math.min(1, Math.max(0, -rect.top / total)) : 1; // only a genuinely tall scroll-scene gates the copy; a normal hero is fully revealed & clickable from the start
       const spinP = Math.min(1, prog / 0.60);                    // full turn done by 60% of the scene
       h.__spin = spinP * 360;                                    // one full turn, ending facing front
       const copyP = Math.min(1, Math.max(0, (prog - 0.56) / 0.20)); // text fades in as the turn completes
@@ -6207,7 +6295,7 @@ if (_origOpen) {
     if (filmDot)  filmDot.style.top = (prog*100).toFixed(2) + '%';
     if (filmPct)  filmPct.textContent = Math.round(prog*100) + '%';
     document.body.classList.toggle('scrolled', sy > 40);
-    if (!reduce) blobs.forEach((b,i) => { b.style.transform = `translateY(${(sy * (0.04 + i*0.03)).toFixed(1)}px)`; });
+    /* blob scroll-parallax removed — transforming 70px-blurred layers every frame caused scroll jank */
   }
   let ticking = false;
   const onScroll = () => { if (!ticking){ ticking = true; requestAnimationFrame(() => { applyScroll(); ticking = false; }); } };
@@ -6223,7 +6311,7 @@ if (_origOpen) {
     let current = document.body.classList.contains('pb-mode') ? 'photobooth' : 'digicam';
     let first = true;
     window.switchTab = function(tab){
-      if (first || reduce || tab === current){ first = false; current = tab; return _switch(tab); }
+      if (first || reduce || tab === current){ first = false; current = tab; return _switch.apply(null, arguments); }
       wipe.classList.remove('opening');
       wipe.classList.add('closing');
       setTimeout(() => {
@@ -6250,7 +6338,7 @@ if (_origOpen) {
       setTimeout(() => { if (sh.parentNode) sh.remove(); }, 1300);
     };
     if (reduce) { sh.remove(); return; }
-    setTimeout(open, 1100);
+    setTimeout(open, 350);
     setTimeout(open, 3000);                              // failsafe
     // Guarantee the camera ends visible even if the intro froze (backgrounded tab)
     const camReady = () => document.body.classList.add('cam-ready');
