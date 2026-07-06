@@ -1614,7 +1614,10 @@
     .ib-field input:focus, .ib-field select:focus, .ib-field textarea:focus { border-color: var(--pb-gold); }
     .ib-field textarea { min-height: 80px; resize: vertical; }
     .ib-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .ib-row-venue { grid-template-columns: 2fr 1fr; }
+    .ib-row-venue { grid-template-columns: 3fr 1fr; }
+    .ib-bg-preview { margin-top:0.5rem; width:100%; height:150px; border:1px solid var(--pb-border); overflow:hidden; background:var(--pb-card); }
+    .ib-bg-preview img { width:100%; height:100%; object-fit:cover; display:block; }
+    .ib-bg-ph { width:100%; height:100%; align-items:center; justify-content:center; color:var(--pb-muted); font-size:0.75rem; font-weight:300; text-align:center; }
     .ib-field .ib-hint { font-size: 0.68rem; color: var(--pb-muted); margin-top: 3px; }
     .ib-venue-suggest {
       position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
@@ -2764,7 +2767,7 @@
         <div class="pb-what-text">
           <div class="pb-section-label">What we offer</div>
           <h2>A photobooth,<br/><em>delivered to you.</em></h2>
-          <p>We bring a fully set-up photobooth to your event — no queues, no apps, no QR codes. Just real, printed photos that guests can hold in their hands the moment they're taken.</p>
+          <p>We bring a fully set-up photobooth to your event — no queues, no fuss. Just real, printed photos that guests can hold in their hands the moment they're taken — plus an optional QR they can scan to grab their shots and remix them online.</p>
           <p>Perfect for birthdays, corporate events, weddings, proms, and any gathering where memories matter.</p>
           <div class="pb-features-row">
             <div class="pb-feature-item">
@@ -2782,6 +2785,10 @@
             <div class="pb-feature-item">
               <div class="pb-feature-icon">🎨</div>
               <div><div class="pb-feature-label">Choose your backdrop</div><div class="pb-feature-desc">Backdrops are free!</div></div>
+            </div>
+            <div class="pb-feature-item">
+              <div class="pb-feature-icon">📲</div>
+              <div><div class="pb-feature-label">Scan, remix &amp; share</div><div class="pb-feature-desc">Scan a QR at the booth to grab your photos, add music &amp; captions, and share online</div></div>
             </div>
           </div>
         </div>
@@ -3281,6 +3288,18 @@
         <div class="bg-card" onclick="openBgPreview('grey')" style="cursor:pointer">
           <div class="bg-swatch" style="background:#9CA3AF">🩶</div>
           <div class="bg-info"><div class="bg-name">Grey</div><div class="bg-price">Included</div></div>
+        </div>
+        <div class="bg-card" onclick="openBgPreview('pink')" style="cursor:pointer">
+          <div class="bg-swatch" style="background:#EC4899">💗</div>
+          <div class="bg-info"><div class="bg-name">Pink</div><div class="bg-price">Included</div></div>
+        </div>
+        <div class="bg-card" onclick="openBgPreview('purple')" style="cursor:pointer">
+          <div class="bg-swatch" style="background:#8B5CF6">💜</div>
+          <div class="bg-info"><div class="bg-name">Purple</div><div class="bg-price">Included</div></div>
+        </div>
+        <div class="bg-card" onclick="openBgPreview('beige')" style="cursor:pointer">
+          <div class="bg-swatch" style="background:#E7D3B3;color:#000">🤎</div>
+          <div class="bg-info"><div class="bg-name">Beige</div><div class="bg-price">Included</div></div>
         </div>
       </div>
 
@@ -4453,9 +4472,18 @@
   function ibBgChange() {
     const bg   = (document.getElementById('ibBackground') || {}).value || '';
     const hint = document.getElementById('ibBgHint');
-    if (hint) hint.innerHTML = (bg === 'Custom')
-      ? "<span style='color:var(--pb-gold)'>A custom-made background carries an additional cost, so this option is quoted by enquiry — you won't be asked to pay directly. We'll email you a tailored quote.</span>"
-      : "<span style='color:var(--pb-gold)'>Green screen gives a clean solid-colour background at no cost. ⚠️ Please avoid wearing green or colours close to green, and write the colour you'd like in the 'Anything else?' box below. Prefer a designed / custom background? Choose 'Custom' and we'll quote it by enquiry.</span>";
+    const prev = document.getElementById('ibBgPreview');
+    const img  = document.getElementById('ibBgPreviewImg');
+    const isCustom = (bg === 'Custom');
+    if (prev) prev.style.display = isCustom ? 'none' : '';
+    if (img && !isCustom) {
+      const ph = img.nextElementSibling;
+      img.style.display = ''; if (ph) ph.style.display = 'none';
+      img.src = 'backgrounds/' + bg.toLowerCase() + '.jpg';
+    }
+    if (hint) hint.innerHTML = isCustom
+      ? "<span style='color:var(--pb-gold)'>A custom-made background carries an additional cost, so it's quoted by enquiry — you won't be asked to pay directly. We'll email you a tailored quote.</span>"
+      : "<span style='color:var(--pb-gold)'>These are just a few examples — a multitude of colours available. We use a green screen, so please avoid wearing green or colours close to green. Prefer a designed / custom background? Choose 'Custom' — it's quoted by enquiry (additional cost).</span>";
     if (typeof ibUpdatePriceHint === 'function') ibUpdatePriceHint();
   }
 
@@ -4834,10 +4862,21 @@
         <div class="ib-field">
           <label>Background</label>
           <select id="ibBackground" onchange="ibBgChange()">
-            <option value="Green Screen">Green screen — solid colour (included)</option>
+            <option value="White">White</option>
+            <option value="Black">Black</option>
+            <option value="Red">Red</option>
+            <option value="Blue">Blue</option>
+            <option value="Grey">Grey</option>
+            <option value="Pink">Pink</option>
+            <option value="Purple">Purple</option>
+            <option value="Beige">Beige</option>
             <option value="Custom">Custom-made background (+ additional cost)</option>
           </select>
-          <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">Green screen gives a clean solid-colour background at no cost. ⚠️ Please avoid wearing green or colours close to green, and write the colour you'd like in the 'Anything else?' box below. Prefer a designed / custom background? Choose 'Custom' and we'll quote it by enquiry.</span></div>
+          <div class="ib-bg-preview" id="ibBgPreview">
+            <img id="ibBgPreviewImg" src="backgrounds/white.jpg" alt="Background sample" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <div class="ib-bg-ph" style="display:none">📷 Sample photo coming soon</div>
+          </div>
+          <div class="ib-hint" id="ibBgHint" style="margin-top:0.4rem"><span style="color:var(--pb-gold)">These are just a few examples — a multitude of colours available. We use a green screen, so please avoid wearing green or colours close to green. Prefer a designed / custom background? Choose 'Custom' — it's quoted by enquiry (additional cost).</span></div>
         </div>
         <div class="ib-field">
           <label>Props package</label>
@@ -4961,7 +5000,7 @@
           <div class="ib-paynow-num">+65 8518 7046</div>
           <div class="ib-paynow-amount">Amount to pay: <strong id="ibPayAmount">S$0</strong></div>
           <div class="ib-qr" id="ibQrCode">
-            <img src="https://dgclicks.github.io/images/paynow-qr.png"
+            <img src="images/paynow-qr.png"
               alt="PayNow QR" style="width:100%;height:100%;object-fit:contain"
               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
             <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.65rem;color:#555;text-align:center;gap:4px">
